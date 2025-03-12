@@ -11,11 +11,12 @@ type Config struct {
 	DBUser     string `env:"DB_USER" envDefault:"postgres"`
 	DBPassword string `env:"DB_PASSWORD" envDefault:"postgres"`
 	DBName     string `env:"DB_NAME" envDefault:"expense"`
+	SSLMode    string `env:"SSL_MODE" envDefault:"require"`
 }
 
 func Load() (*Config, error) {
 	_ = godotenv.Load()
-	
+
 	cfg := &Config{}
 	if err := env.Parse(cfg); err != nil {
 		return nil, err

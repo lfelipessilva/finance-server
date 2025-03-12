@@ -18,8 +18,8 @@ func main() {
 	}
 
 	// Database connection
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort, cfg.SSLMode)
 	db, err := database.NewPostgresConnection(dsn)
 	if err != nil {
 		panic("failed to connect database: " + err.Error())

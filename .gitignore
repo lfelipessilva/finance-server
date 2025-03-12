@@ -1,2 +1,5 @@
 .env
+
 cmd/server/app
+
+vendor

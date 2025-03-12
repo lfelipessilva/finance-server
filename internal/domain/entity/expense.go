@@ -6,11 +6,11 @@ import (
 )
 
 type Expense struct {
-	ID        uint
-	Name      string
-	Category  string
-	Timestamp time.Time
-	Value     float64
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	Name      string    `json:"name"`
+	Category  string    `json:"category"`
+	Timestamp time.Time `json:"timestamp"`
+	Value     float64   `json:"value"`
 }
 
 func (e *Expense) Validate() error {
