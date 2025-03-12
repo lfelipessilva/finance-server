@@ -35,6 +35,8 @@ func main() {
 
 	// Server setup
 	router := gin.Default()
+	router.Use(CORSMiddleware())
+
 	api := router.Group("/api/v1")
 	{
 		api.POST("/expenses", expenseHandler.CreateExpense)
