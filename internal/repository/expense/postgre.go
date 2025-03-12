@@ -4,6 +4,7 @@ import (
 	"context"
 	"finance/internal/domain/entity"
 	"finance/internal/domain/vo"
+
 	"gorm.io/gorm"
 )
 
@@ -17,6 +18,15 @@ func NewPostgresRepository(db *gorm.DB) Repository {
 
 func (r *postgresRepository) Create(ctx context.Context, expense *entity.Expense) error {
 	return r.db.WithContext(ctx).Create(expense).Error
+}
+
+func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []entity.Expense) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.CreateInBatches(expenses, 100).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (r *postgresRepository) FindByFilters(ctx context.Context, category string, my *vo.MonthYear) ([]entity.Expense, error) {

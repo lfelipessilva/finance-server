@@ -9,6 +9,7 @@ import (
 
 type UseCase interface {
 	CreateExpense(ctx context.Context, input CreateExpenseInput) (*entity.Expense, error)
+	CreateExpenses(ctx context.Context, inputs []CreateExpenseInput) ([]entity.Expense, error)
 	GetExpenses(ctx context.Context, filters ExpenseFilters) ([]entity.Expense, error)
 }
 

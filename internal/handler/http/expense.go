@@ -34,6 +34,23 @@ func (h *ExpenseHandler) CreateExpense(c *gin.Context) {
 	c.JSON(http.StatusCreated, createdExpense)
 }
 
+func (h *ExpenseHandler) CreateExpenses(c *gin.Context) {
+	var inputs []expense.CreateExpenseInput
+
+	if err := c.ShouldBindJSON(&inputs); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request format"})
+		return
+	}
+
+	createdExpenses, err := h.uc.CreateExpenses(c.Request.Context(), inputs)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"data": createdExpenses})
+}
+
 func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
 	filters := parseFilters(c)
 

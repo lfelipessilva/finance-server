@@ -8,5 +8,6 @@ import (
 
 type Repository interface {
 	Create(ctx context.Context, expense *entity.Expense) error
+	CreateBatch(ctx context.Context, expense []entity.Expense) error
 	FindByFilters(ctx context.Context, category string, monthYear *vo.MonthYear) ([]entity.Expense, error)
 }
