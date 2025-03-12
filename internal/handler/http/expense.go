@@ -34,6 +34,24 @@ func (h *ExpenseHandler) CreateExpense(c *gin.Context) {
 	c.JSON(http.StatusCreated, createdExpense)
 }
 
+func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
+	var input expense.UpdateExpenseInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	id := c.Param("id")
+
+	updatedExpense, err := h.uc.UpdateExpense(c.Request.Context(), input, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusAccepted, updatedExpense)
+}
+
 func (h *ExpenseHandler) CreateExpenses(c *gin.Context) {
 	var inputs []expense.CreateExpenseInput
 

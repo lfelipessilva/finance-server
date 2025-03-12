@@ -38,6 +38,7 @@ func main() {
 	api := router.Group("/api/v1")
 	{
 		api.POST("/expenses", expenseHandler.CreateExpense)
+		api.PUT("/expenses/:id", expenseHandler.UpdateExpense)
 		api.POST("/expenses/batch", expenseHandler.CreateExpenses)
 		api.GET("/expenses", expenseHandler.GetExpenses)
 	}

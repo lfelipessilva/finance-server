@@ -35,6 +35,25 @@ func (uc *expenseUseCase) CreateExpense(ctx context.Context, input CreateExpense
 	return expense, nil
 }
 
+func (uc *expenseUseCase) UpdateExpense(ctx context.Context, input UpdateExpenseInput, id string) (*entity.Expense, error) {
+	expense := &entity.Expense{
+		Name:      input.Name,
+		Category:  input.Category,
+		Timestamp: input.Timestamp,
+		Value:     input.Value,
+	}
+
+	if err := expense.Validate(); err != nil {
+		return nil, err
+	}
+
+	if err := uc.repo.Update(ctx, expense, id); err != nil {
+		return nil, err
+	}
+
+	return expense, nil
+}
+
 func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExpenseInput) ([]entity.Expense, error) {
 	var expenses []entity.Expense
 	var validationErrors []string

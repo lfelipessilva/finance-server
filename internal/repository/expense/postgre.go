@@ -20,6 +20,13 @@ func (r *postgresRepository) Create(ctx context.Context, expense *entity.Expense
 	return r.db.WithContext(ctx).Create(expense).Error
 }
 
+func (r *postgresRepository) Update(ctx context.Context, expense *entity.Expense, id string) error {
+	return r.db.WithContext(ctx).
+		Model(&entity.Expense{}).
+		Where("id = ?", id).
+		Updates(expense).Error
+}
+
 func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []entity.Expense) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.CreateInBatches(expenses, 100).Error; err != nil {
