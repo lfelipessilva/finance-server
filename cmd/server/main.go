@@ -3,8 +3,11 @@ package main
 import (
 	"finance/config"
 	"finance/internal/handler/http"
-	expenseRepo "finance/internal/repository/expense"
-	expenseUseCase "finance/internal/usecase/expense"
+	catRepo "finance/internal/repository/category"
+	expRepo "finance/internal/repository/expense"
+	catUC "finance/internal/usecase/category"
+	expUC "finance/internal/usecase/expense"
+
 	"finance/pkg/database"
 	"fmt"
 
@@ -29,9 +32,13 @@ func main() {
 	// migrate -path migrations -database "postgres://user:pass@host:port/dbname?sslmode=disable" up
 
 	// Setup layers
-	expenseRepo := expenseRepo.NewPostgresRepository(db)
-	expenseUC := expenseUseCase.NewExpenseUseCase(expenseRepo)
-	expenseHandler := http.NewExpenseHandler(expenseUC)
+	expenseRepository := expRepo.NewPostgresRepository(db)
+	expenseUseCase := expUC.NewExpenseUseCase(expenseRepository)
+	expenseHandler := http.NewExpenseHandler(expenseUseCase)
+
+	categoryRepository := catRepo.NewPostgresRepository(db)
+	categoryUseCase := catUC.NewCategoryUseCse(categoryRepository)
+	categoryHandler := http.NewCategoryHandler(categoryUseCase)
 
 	// Server setup
 	router := gin.Default()
@@ -54,6 +61,8 @@ func main() {
 		api.PUT("/expenses/:id", expenseHandler.UpdateExpense)
 		api.POST("/expenses/batch", expenseHandler.CreateExpenses)
 		api.GET("/expenses", expenseHandler.GetExpenses)
+
+		api.GET("/categories", categoryHandler.GetCategories)
 	}
 
 	if err := router.Run(":8080"); err != nil {
