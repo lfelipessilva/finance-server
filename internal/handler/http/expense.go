@@ -90,7 +90,6 @@ func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
 func parseFilters(c *gin.Context) domain.ExpenseFilters {
 	var filters domain.ExpenseFilters
 
-	// Parsing timestamp filters (timestamp> and timestamp<)
 	if timestampStart := c.Query("timestamp_start"); timestampStart != "" {
 		filters.TimestampStart = timestampStart
 	}

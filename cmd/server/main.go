@@ -20,7 +20,6 @@ func main() {
 		panic("failed to load config: " + err.Error())
 	}
 
-	// Database connection
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
 		cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort, cfg.SSLMode)
 	db, err := database.NewPostgresConnection(dsn)
@@ -28,10 +27,6 @@ func main() {
 		panic("failed to connect database: " + err.Error())
 	}
 
-	// Run migrations (you might want to run this separately)
-	// migrate -path migrations -database "postgres://user:pass@host:port/dbname?sslmode=disable" up
-
-	// Setup layers
 	expenseRepository := expRepo.NewPostgresRepository(db)
 	expenseUseCase := expUC.NewExpenseUseCase(expenseRepository)
 	expenseHandler := http.NewExpenseHandler(expenseUseCase)
@@ -40,7 +35,6 @@ func main() {
 	categoryUseCase := catUC.NewCategoryUseCse(categoryRepository)
 	categoryHandler := http.NewCategoryHandler(categoryUseCase)
 
-	// Server setup
 	router := gin.Default()
 	router.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
