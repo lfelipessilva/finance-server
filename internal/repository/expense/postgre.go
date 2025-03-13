@@ -54,7 +54,7 @@ func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.E
 	}
 
 	offset := (filters.Page - 1) * filters.PageSize
-	if err := query.Offset(offset).Limit(filters.PageSize).Scan(&expenses).Error; err != nil {
+	if err := query.Offset(offset).Limit(filters.PageSize).Find(&expenses).Order("timestamp DESC").Error; err != nil {
 		return nil, 0, err
 	}
 
