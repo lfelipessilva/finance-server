@@ -2,8 +2,8 @@ package expense
 
 import (
 	"context"
+	domain "finance/internal/domain/dto"
 	"finance/internal/domain/entity"
-	"finance/internal/domain/vo"
 
 	"gorm.io/gorm"
 )
@@ -36,22 +36,27 @@ func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []entity.
 	})
 }
 
-func (r *postgresRepository) FindByFilters(ctx context.Context, category string, my *vo.MonthYear) ([]entity.Expense, error) {
+func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, error) {
 	var expenses []entity.Expense
 	query := r.db.WithContext(ctx)
 
-	if category != "" {
-		query = query.Where("category = ?", category)
+	if filters.TimestampStart != "" {
+		query = query.Where("timestamp >= ?", filters.TimestampStart)
 	}
 
-	if my != nil {
-		start, end := my.TimeRange()
-		query = query.Where("timestamp >= ? AND timestamp < ?", start, end)
+	if filters.TimestampEnd != "" {
+		query = query.Where("timestamp <= ?", filters.TimestampEnd)
 	}
 
-	if err := query.Find(&expenses).Error; err != nil {
-		return nil, err
+	var total int64
+	if err := query.Model(&entity.Expense{}).Count(&total).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return expenses, nil
+	offset := (filters.Page - 1) * filters.PageSize
+	if err := query.Offset(offset).Limit(filters.PageSize).Scan(&expenses).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return expenses, int(total), nil
 }

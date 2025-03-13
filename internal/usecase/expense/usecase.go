@@ -2,6 +2,7 @@ package expense
 
 import (
 	"context"
+	domain "finance/internal/domain/dto"
 	"finance/internal/domain/entity"
 	"finance/internal/repository/expense"
 	"fmt"
@@ -87,6 +88,6 @@ func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExp
 	return expenses, nil
 }
 
-func (uc *expenseUseCase) GetExpenses(ctx context.Context, filters ExpenseFilters) ([]entity.Expense, error) {
-	return uc.repo.FindByFilters(ctx, filters.Category, filters.MonthYear)
+func (uc *expenseUseCase) GetExpenses(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, error) {
+	return uc.repo.FindByFilters(ctx, filters)
 }

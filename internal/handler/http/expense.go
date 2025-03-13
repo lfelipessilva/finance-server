@@ -1,11 +1,10 @@
 package http
 
 import (
-	"finance/internal/domain/vo"
+	domain "finance/internal/domain/dto"
 	"finance/internal/usecase/expense"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -72,28 +71,40 @@ func (h *ExpenseHandler) CreateExpenses(c *gin.Context) {
 func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
 	filters := parseFilters(c)
 
-	expenses, err := h.uc.GetExpenses(c.Request.Context(), filters)
+	expenses, total, err := h.uc.GetExpenses(c.Request.Context(), filters)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, expenses)
+	c.JSON(http.StatusOK, gin.H{
+		"data": expenses,
+		"summary": gin.H{
+			"total":     total,
+			"page":      filters.Page,
+			"page_size": filters.PageSize,
+		},
+	})
 }
 
-func parseFilters(c *gin.Context) expense.ExpenseFilters {
-	var filters expense.ExpenseFilters
+func parseFilters(c *gin.Context) domain.ExpenseFilters {
+	var filters domain.ExpenseFilters
 
-	if month := c.Query("month"); month != "" {
-		year := c.DefaultQuery("year", strconv.Itoa(time.Now().Year()))
-		monthInt, _ := strconv.Atoi(month)
-		yearInt, _ := strconv.Atoi(year)
-
-		if my, err := vo.NewMonthYear(monthInt, yearInt); err == nil {
-			filters.MonthYear = &my
-		}
+	// Parsing timestamp filters (timestamp> and timestamp<)
+	if timestampStart := c.Query("timestamp_start"); timestampStart != "" {
+		filters.TimestampStart = timestampStart
+	}
+	if timestampEnd := c.Query("timestamp_end"); timestampEnd != "" {
+		filters.TimestampEnd = timestampEnd
 	}
 
-	filters.Category = c.Query("category")
+	page := c.DefaultQuery("page", "1")
+	pageSize := c.DefaultQuery("page_size", "50")
+	pageInt, _ := strconv.Atoi(page)
+	pageSizeInt, _ := strconv.Atoi(pageSize)
+
+	filters.Page = pageInt
+	filters.PageSize = pageSizeInt
+
 	return filters
 }
