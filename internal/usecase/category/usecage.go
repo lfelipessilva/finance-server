@@ -2,6 +2,7 @@ package category
 
 import (
 	"context"
+	domain "finance/internal/domain/dto"
 	"finance/internal/domain/entity"
 	"finance/internal/repository/category"
 )
@@ -14,6 +15,6 @@ func NewCategoryUseCse(repo category.Repository) UseCase {
 	return &categoryUseCase{repo: repo}
 }
 
-func (uc *categoryUseCase) GetCategories(ctx context.Context) ([]entity.Category, error) {
-	return uc.repo.FindAll(ctx)
+func (uc *categoryUseCase) GetCategories(ctx context.Context, filters domain.CategoryFilters) ([]entity.Category, error) {
+	return uc.repo.FindAll(ctx, filters)
 }

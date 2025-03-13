@@ -1,6 +1,7 @@
 package http
 
 import (
+	domain "finance/internal/domain/dto"
 	"finance/internal/usecase/category"
 	"net/http"
 
@@ -16,11 +17,14 @@ func NewCategoryHandler(uc category.UseCase) *CategoryHandler {
 }
 
 func (h *CategoryHandler) GetCategories(c *gin.Context) {
-	expenses, err := h.uc.GetCategories(c.Request.Context())
+	var filters domain.CategoryFilters
+	filters.Name = c.Query("name")
+
+	categories, err := h.uc.GetCategories(c.Request.Context(), filters)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, expenses)
+	c.JSON(http.StatusOK, categories)
 }
