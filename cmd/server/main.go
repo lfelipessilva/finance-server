@@ -5,6 +5,7 @@ import (
 	"finance/internal/handler/http"
 	catRepo "finance/internal/repository/category"
 	expRepo "finance/internal/repository/expense"
+	tagRepo "finance/internal/repository/tag"
 	catUC "finance/internal/usecase/category"
 	expUC "finance/internal/usecase/expense"
 
@@ -27,8 +28,10 @@ func main() {
 		panic("failed to connect database: " + err.Error())
 	}
 
+	tagRepository := tagRepo.NewPostgresRepository(db)
+
 	expenseRepository := expRepo.NewPostgresRepository(db)
-	expenseUseCase := expUC.NewExpenseUseCase(expenseRepository)
+	expenseUseCase := expUC.NewExpenseUseCase(expenseRepository, tagRepository)
 	expenseHandler := http.NewExpenseHandler(expenseUseCase)
 
 	categoryRepository := catRepo.NewPostgresRepository(db)

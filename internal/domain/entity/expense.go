@@ -15,6 +15,7 @@ type Expense struct {
 	Value       float64   `json:"value"`
 	CategoryID  uint      `json:"category_id"`
 	Category    Category  `gorm:"foreignKey:CategoryID;constraint:OnDelete:CASCADE;" json:"category"`
+	Tags        []Tag     `gorm:"many2many:expense_tags;" json:"tags"`
 }
 
 func (e *Expense) Validate() error {

@@ -17,6 +17,7 @@ type UseCase interface {
 type CreateExpenseInput struct {
 	Name       string
 	CategoryID uint
+	TagIDs     []uint
 	Bank       string
 	Card       string
 	Timestamp  time.Time
@@ -26,6 +27,7 @@ type CreateExpenseInput struct {
 type UpdateExpenseInput struct {
 	Name       string
 	CategoryID uint
+	TagIDs     []uint
 	Bank       string
 	Card       string
 	Timestamp  time.Time

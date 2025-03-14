@@ -4,6 +4,7 @@ import (
 	"context"
 	domain "finance/internal/domain/dto"
 	"finance/internal/domain/entity"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -15,14 +16,15 @@ type postgresRepository struct {
 func NewPostgresRepository(db *gorm.DB) Repository {
 	return &postgresRepository{db: db}
 }
+
 func (r *postgresRepository) Create(ctx context.Context, expense *entity.Expense) (*entity.Expense, error) {
 	if err := r.db.WithContext(ctx).Create(expense).Error; err != nil {
 		return nil, err
 	}
 
-	// Load the related category
 	if err := r.db.WithContext(ctx).
 		Preload("Category").
+		Preload("Tags").
 		First(expense, expense.ID).Error; err != nil {
 		return nil, err
 	}
@@ -37,7 +39,7 @@ func (r *postgresRepository) Update(ctx context.Context, expense *entity.Expense
 		Updates(expense).Error
 }
 
-func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []entity.Expense) ([]*entity.Expense, error) {
+func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []*entity.Expense) ([]*entity.Expense, error) {
 	if err := r.db.WithContext(ctx).Create(&expenses).Error; err != nil {
 		return nil, err
 	}
@@ -50,6 +52,7 @@ func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []entity.
 	var createdExpenses []*entity.Expense
 	if err := r.db.WithContext(ctx).
 		Preload("Category").
+		Preload("Tags").
 		Find(&createdExpenses, expenseIDs).Error; err != nil {
 		return nil, err
 	}
@@ -75,9 +78,10 @@ func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.E
 	}
 
 	offset := (filters.Page - 1) * filters.PageSize
-	if err := query.Offset(offset).Limit(filters.PageSize).Find(&expenses).Order("timestamp DESC").Error; err != nil {
+	if err := query.Offset(offset).Limit(filters.PageSize).Preload("Tags").Preload("Category").Find(&expenses).Order("timestamp ASC").Error; err != nil {
 		return nil, 0, err
 	}
 
+	fmt.Print(expenses)
 	return expenses, int(total), nil
 }

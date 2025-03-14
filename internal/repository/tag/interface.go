@@ -7,5 +7,6 @@ import (
 )
 
 type Repository interface {
-	FindAll(ctx context.Context, filers domain.TagFilters) ([]entity.Tag, error)
+	FindAll(ctx context.Context, filters domain.TagFilters) ([]entity.Tag, error)
+	FindById(ctx context.Context, ids []uint) ([]entity.Tag, error)
 }

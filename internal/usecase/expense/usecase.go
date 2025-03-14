@@ -5,24 +5,31 @@ import (
 	domain "finance/internal/domain/dto"
 	"finance/internal/domain/entity"
 	"finance/internal/repository/expense"
+	"finance/internal/repository/tag"
 	"fmt"
 	"strings"
 )
 
 type expenseUseCase struct {
-	repo expense.Repository
+	repo    expense.Repository
+	tagRepo tag.Repository
 }
 
-func NewExpenseUseCase(repo expense.Repository) UseCase {
-	return &expenseUseCase{repo: repo}
+func NewExpenseUseCase(repo expense.Repository, tagRepo tag.Repository) UseCase {
+	return &expenseUseCase{repo: repo, tagRepo: tagRepo}
 }
 
 func (uc *expenseUseCase) CreateExpense(ctx context.Context, input CreateExpenseInput) (*entity.Expense, error) {
-	fmt.Println(input)
+	tags, err := uc.tagRepo.FindById(ctx, input.TagIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	expense := &entity.Expense{
 		Name:       input.Name,
 		Timestamp:  input.Timestamp,
 		CategoryID: input.CategoryID,
+		Tags:       tags,
 		Bank:       input.Bank,
 		Card:       input.Card,
 		Value:      input.Value,
@@ -32,20 +39,24 @@ func (uc *expenseUseCase) CreateExpense(ctx context.Context, input CreateExpense
 		return nil, err
 	}
 
-	expense, err := uc.repo.Create(ctx, expense)
-
+	createdExpense, err := uc.repo.Create(ctx, expense)
 	if err != nil {
 		return nil, err
 	}
 
-	return expense, nil
+	return createdExpense, nil
 }
 
 func (uc *expenseUseCase) UpdateExpense(ctx context.Context, input UpdateExpenseInput, id string) (*entity.Expense, error) {
+	tags, err := uc.tagRepo.FindById(ctx, input.TagIDs)
+	if err != nil {
+		return nil, err
+	}
 	expense := &entity.Expense{
 		Name:       input.Name,
 		Timestamp:  input.Timestamp,
 		CategoryID: input.CategoryID,
+		Tags:       tags,
 		Bank:       input.Bank,
 		Card:       input.Card,
 		Value:      input.Value,
@@ -59,17 +70,48 @@ func (uc *expenseUseCase) UpdateExpense(ctx context.Context, input UpdateExpense
 }
 
 func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExpenseInput) ([]*entity.Expense, error) {
-	var expenses []entity.Expense
+	uniqueTagIDs := make(map[uint]struct{})
+	for _, expenseInput := range inputs {
+		for _, tagID := range expenseInput.TagIDs {
+			uniqueTagIDs[tagID] = struct{}{}
+		}
+	}
+
+	var tagIDs []uint
+	for tagID := range uniqueTagIDs {
+		tagIDs = append(tagIDs, tagID)
+	}
+
+	tagIDMap := make(map[uint]entity.Tag)
+	if len(tagIDs) > 0 {
+		tags, err := uc.tagRepo.FindById(ctx, tagIDs)
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch tags: %w", err)
+		}
+		for _, tag := range tags {
+			tagIDMap[tag.ID] = tag
+		}
+	}
+
+	var expenses []*entity.Expense
 	var validationErrors []string
 
-	for i, input := range inputs {
-		expense := entity.Expense{
-			Name:       input.Name,
-			Timestamp:  input.Timestamp,
-			CategoryID: input.CategoryID,
-			Bank:       input.Bank,
-			Card:       input.Card,
-			Value:      input.Value,
+	for i, expenseInput := range inputs {
+		var assignedTags []entity.Tag
+		for _, tagID := range expenseInput.TagIDs {
+			if tag, exists := tagIDMap[tagID]; exists {
+				assignedTags = append(assignedTags, tag)
+			}
+		}
+
+		expense := &entity.Expense{
+			Name:       expenseInput.Name,
+			Timestamp:  expenseInput.Timestamp,
+			CategoryID: expenseInput.CategoryID,
+			Bank:       expenseInput.Bank,
+			Card:       expenseInput.Card,
+			Value:      expenseInput.Value,
+			Tags:       assignedTags,
 		}
 
 		if err := expense.Validate(); err != nil {
@@ -82,12 +124,10 @@ func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExp
 	}
 
 	if len(validationErrors) > 0 {
-		return nil, fmt.Errorf("validation errors:\n%s",
-			strings.Join(validationErrors, "\n"))
+		return nil, fmt.Errorf("validation errors:\n%s", strings.Join(validationErrors, "\n"))
 	}
 
 	created, err := uc.repo.CreateBatch(ctx, expenses)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to create expenses: %w", err)
 	}
