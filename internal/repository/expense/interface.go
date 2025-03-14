@@ -7,8 +7,8 @@ import (
 )
 
 type Repository interface {
-	Create(ctx context.Context, expense *entity.Expense) error
+	Create(ctx context.Context, expense *entity.Expense) (*entity.Expense, error)
 	Update(ctx context.Context, expense *entity.Expense, id string) error
-	CreateBatch(ctx context.Context, expense []entity.Expense) error
+	CreateBatch(ctx context.Context, expense []entity.Expense) ([]*entity.Expense, error)
 	FindByFilters(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, error)
 }

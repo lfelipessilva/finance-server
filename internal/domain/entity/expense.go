@@ -6,11 +6,15 @@ import (
 )
 
 type Expense struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
-	Name      string    `json:"name"`
-	Category  string    `json:"category"`
-	Timestamp time.Time `json:"timestamp"`
-	Value     float64   `json:"value"`
+	ID          uint      `gorm:"primaryKey" json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Bank        string    `json:"bank"`
+	Card        string    `json:"card"`
+	Timestamp   time.Time `json:"timestamp"`
+	Value       float64   `json:"value"`
+	CategoryID  uint      `json:"category_id"`
+	Category    Category  `gorm:"foreignKey:CategoryID;constraint:OnDelete:CASCADE;" json:"category"`
 }
 
 func (e *Expense) Validate() error {
@@ -19,9 +23,6 @@ func (e *Expense) Validate() error {
 	}
 	if e.Name == "" {
 		return errors.New("field 'name' is required")
-	}
-	if e.Category == "" {
-		return errors.New("field 'category' is required")
 	}
 	if e.Timestamp.IsZero() {
 		return errors.New("field 'timestamp' must be a valid time")

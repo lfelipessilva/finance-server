@@ -18,18 +18,23 @@ func NewExpenseUseCase(repo expense.Repository) UseCase {
 }
 
 func (uc *expenseUseCase) CreateExpense(ctx context.Context, input CreateExpenseInput) (*entity.Expense, error) {
+	fmt.Println(input)
 	expense := &entity.Expense{
-		Name:      input.Name,
-		Category:  input.Category,
-		Timestamp: input.Timestamp,
-		Value:     input.Value,
+		Name:       input.Name,
+		Timestamp:  input.Timestamp,
+		CategoryID: input.CategoryID,
+		Bank:       input.Bank,
+		Card:       input.Card,
+		Value:      input.Value,
 	}
 
 	if err := expense.Validate(); err != nil {
 		return nil, err
 	}
 
-	if err := uc.repo.Create(ctx, expense); err != nil {
+	expense, err := uc.repo.Create(ctx, expense)
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -38,14 +43,12 @@ func (uc *expenseUseCase) CreateExpense(ctx context.Context, input CreateExpense
 
 func (uc *expenseUseCase) UpdateExpense(ctx context.Context, input UpdateExpenseInput, id string) (*entity.Expense, error) {
 	expense := &entity.Expense{
-		Name:      input.Name,
-		Category:  input.Category,
-		Timestamp: input.Timestamp,
-		Value:     input.Value,
-	}
-
-	if err := expense.Validate(); err != nil {
-		return nil, err
+		Name:       input.Name,
+		Timestamp:  input.Timestamp,
+		CategoryID: input.CategoryID,
+		Bank:       input.Bank,
+		Card:       input.Card,
+		Value:      input.Value,
 	}
 
 	if err := uc.repo.Update(ctx, expense, id); err != nil {
@@ -55,16 +58,18 @@ func (uc *expenseUseCase) UpdateExpense(ctx context.Context, input UpdateExpense
 	return expense, nil
 }
 
-func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExpenseInput) ([]entity.Expense, error) {
+func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExpenseInput) ([]*entity.Expense, error) {
 	var expenses []entity.Expense
 	var validationErrors []string
 
 	for i, input := range inputs {
 		expense := entity.Expense{
-			Name:      input.Name,
-			Category:  input.Category,
-			Timestamp: input.Timestamp,
-			Value:     input.Value,
+			Name:       input.Name,
+			Timestamp:  input.Timestamp,
+			CategoryID: input.CategoryID,
+			Bank:       input.Bank,
+			Card:       input.Card,
+			Value:      input.Value,
 		}
 
 		if err := expense.Validate(); err != nil {
@@ -81,11 +86,13 @@ func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExp
 			strings.Join(validationErrors, "\n"))
 	}
 
-	if err := uc.repo.CreateBatch(ctx, expenses); err != nil {
+	created, err := uc.repo.CreateBatch(ctx, expenses)
+
+	if err != nil {
 		return nil, fmt.Errorf("failed to create expenses: %w", err)
 	}
 
-	return expenses, nil
+	return created, nil
 }
 
 func (uc *expenseUseCase) GetExpenses(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, error) {

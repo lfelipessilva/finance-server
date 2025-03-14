@@ -15,9 +15,19 @@ type postgresRepository struct {
 func NewPostgresRepository(db *gorm.DB) Repository {
 	return &postgresRepository{db: db}
 }
+func (r *postgresRepository) Create(ctx context.Context, expense *entity.Expense) (*entity.Expense, error) {
+	if err := r.db.WithContext(ctx).Create(expense).Error; err != nil {
+		return nil, err
+	}
 
-func (r *postgresRepository) Create(ctx context.Context, expense *entity.Expense) error {
-	return r.db.WithContext(ctx).Create(expense).Error
+	// Load the related category
+	if err := r.db.WithContext(ctx).
+		Preload("Category").
+		First(expense, expense.ID).Error; err != nil {
+		return nil, err
+	}
+
+	return expense, nil
 }
 
 func (r *postgresRepository) Update(ctx context.Context, expense *entity.Expense, id string) error {
@@ -27,13 +37,24 @@ func (r *postgresRepository) Update(ctx context.Context, expense *entity.Expense
 		Updates(expense).Error
 }
 
-func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []entity.Expense) error {
-	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.CreateInBatches(expenses, 100).Error; err != nil {
-			return err
-		}
-		return nil
-	})
+func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []entity.Expense) ([]*entity.Expense, error) {
+	if err := r.db.WithContext(ctx).Create(&expenses).Error; err != nil {
+		return nil, err
+	}
+
+	expenseIDs := make([]uint, len(expenses))
+	for i, expense := range expenses {
+		expenseIDs[i] = expense.ID
+	}
+
+	var createdExpenses []*entity.Expense
+	if err := r.db.WithContext(ctx).
+		Preload("Category").
+		Find(&createdExpenses, expenseIDs).Error; err != nil {
+		return nil, err
+	}
+
+	return createdExpenses, nil
 }
 
 func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, error) {

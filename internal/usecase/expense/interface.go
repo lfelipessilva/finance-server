@@ -10,20 +10,24 @@ import (
 type UseCase interface {
 	CreateExpense(ctx context.Context, input CreateExpenseInput) (*entity.Expense, error)
 	UpdateExpense(ctx context.Context, input UpdateExpenseInput, id string) (*entity.Expense, error)
-	CreateExpenses(ctx context.Context, inputs []CreateExpenseInput) ([]entity.Expense, error)
+	CreateExpenses(ctx context.Context, inputs []CreateExpenseInput) ([]*entity.Expense, error)
 	GetExpenses(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, error)
 }
 
 type CreateExpenseInput struct {
-	Name      string
-	Category  string
-	Timestamp time.Time
-	Value     float64
+	Name       string
+	CategoryID uint
+	Bank       string
+	Card       string
+	Timestamp  time.Time
+	Value      float64
 }
 
 type UpdateExpenseInput struct {
-	Name      string
-	Category  string
-	Timestamp time.Time
-	Value     float64
+	Name       string
+	CategoryID uint
+	Bank       string
+	Card       string
+	Timestamp  time.Time
+	Value      float64
 }
