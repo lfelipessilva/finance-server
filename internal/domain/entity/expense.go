@@ -14,7 +14,7 @@ type Expense struct {
 	Card         string    `json:"card"`
 	Timestamp    time.Time `json:"timestamp"`
 	Value        float64   `json:"value"`
-	CategoryID   uint      `json:"category_id"`
+	CategoryID   *uint     `json:"category_id,omitempty"`
 	Category     Category  `gorm:"foreignKey:CategoryID;constraint:OnDelete:CASCADE;" json:"category"`
 	Tags         []Tag     `gorm:"many2many:expense_tags;" json:"tags"`
 }
