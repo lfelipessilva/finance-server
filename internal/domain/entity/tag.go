@@ -5,9 +5,9 @@ import (
 )
 
 type Tag struct {
-	ID    uint `gorm:"primaryKey" json:"id"`
-	Name  string
-	Color string
+	ID    uint   `gorm:"primaryKey" json:"id"`
+	Name  string `json:"name"`
+	Color string `json:"color"`
 }
 
 func (e *Tag) Validate() error {

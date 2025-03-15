@@ -4,7 +4,6 @@ import (
 	"context"
 	domain "finance/internal/domain/dto"
 	"finance/internal/domain/entity"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -82,6 +81,5 @@ func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.E
 		return nil, 0, err
 	}
 
-	fmt.Print(expenses)
 	return expenses, int(total), nil
 }

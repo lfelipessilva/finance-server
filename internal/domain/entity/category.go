@@ -5,10 +5,10 @@ import (
 )
 
 type Category struct {
-	ID    uint `gorm:"primaryKey" json:"id"`
-	Name  string
-	Color string
-	Icon  string
+	ID    uint   `gorm:"primaryKey" json:"id"`
+	Name  string `json:"name"`
+	Color string `json:"color"`
+	Icon  string `json:"icon"`
 }
 
 func (e *Category) Validate() error {
