@@ -26,13 +26,14 @@ func (uc *expenseUseCase) CreateExpense(ctx context.Context, input CreateExpense
 	}
 
 	expense := &entity.Expense{
-		Name:       input.Name,
-		Timestamp:  input.Timestamp,
-		CategoryID: input.CategoryID,
-		Tags:       tags,
-		Bank:       input.Bank,
-		Card:       input.Card,
-		Value:      input.Value,
+		Name:         input.Name,
+		OriginalName: input.Name,
+		Timestamp:    input.Timestamp,
+		CategoryID:   input.CategoryID,
+		Tags:         tags,
+		Bank:         input.Bank,
+		Card:         input.Card,
+		Value:        input.Value,
 	}
 
 	if err := expense.Validate(); err != nil {
@@ -105,13 +106,14 @@ func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExp
 		}
 
 		expense := &entity.Expense{
-			Name:       expenseInput.Name,
-			Timestamp:  expenseInput.Timestamp,
-			CategoryID: expenseInput.CategoryID,
-			Bank:       expenseInput.Bank,
-			Card:       expenseInput.Card,
-			Value:      expenseInput.Value,
-			Tags:       assignedTags,
+			Name:         expenseInput.Name,
+			OriginalName: expenseInput.Name,
+			Timestamp:    expenseInput.Timestamp,
+			CategoryID:   expenseInput.CategoryID,
+			Bank:         expenseInput.Bank,
+			Card:         expenseInput.Card,
+			Value:        expenseInput.Value,
+			Tags:         assignedTags,
 		}
 
 		if err := expense.Validate(); err != nil {
