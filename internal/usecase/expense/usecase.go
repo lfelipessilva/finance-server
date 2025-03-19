@@ -28,6 +28,7 @@ func (uc *expenseUseCase) CreateExpense(ctx context.Context, input CreateExpense
 
 	expense := &entity.Expense{
 		Name:         input.Name,
+		Description:  input.Description,
 		OriginalName: input.Name,
 		Timestamp:    input.Timestamp,
 		CategoryID:   input.CategoryID,
@@ -79,6 +80,7 @@ func (uc *expenseUseCase) UpdateExpenses(ctx context.Context, input UpdateExpens
 
 	expense := &entity.Expense{
 		Name:         input.Name,
+		Description:  input.Description,
 		OriginalName: input.Name,
 		Timestamp:    input.Timestamp,
 		CategoryID:   input.CategoryID,
@@ -98,6 +100,7 @@ func (uc *expenseUseCase) UpdateExpenses(ctx context.Context, input UpdateExpens
 		expense := &entity.Expense{
 			ID:           uint(expenseID),
 			Name:         input.Name,
+			Description:  input.Description,
 			OriginalName: input.Name,
 			Timestamp:    input.Timestamp,
 			CategoryID:   input.CategoryID,
@@ -154,6 +157,7 @@ func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExp
 
 		expense := &entity.Expense{
 			Name:         expenseInput.Name,
+			Description:  expenseInput.Description,
 			OriginalName: expenseInput.Name,
 			Timestamp:    expenseInput.Timestamp,
 			CategoryID:   expenseInput.CategoryID,

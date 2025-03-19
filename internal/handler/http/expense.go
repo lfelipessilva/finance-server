@@ -3,6 +3,7 @@ package http
 import (
 	domain "finance/internal/domain/dto"
 	"finance/internal/usecase/expense"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -58,6 +59,7 @@ func (h *ExpenseHandler) UpdateExpenses(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&body); err != nil {
+		fmt.Print(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request format"})
 		return
 	}
