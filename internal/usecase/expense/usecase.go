@@ -140,3 +140,21 @@ func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExp
 func (uc *expenseUseCase) GetExpenses(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, error) {
 	return uc.repo.FindByFilters(ctx, filters)
 }
+
+func (uc *expenseUseCase) DeleteExpense(ctx context.Context, id string) error {
+	err := uc.repo.Delete(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (uc *expenseUseCase) DeleteExpenses(ctx context.Context, ids []string) error {
+	err := uc.repo.DeleteBatch(ctx, ids)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

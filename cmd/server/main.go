@@ -58,6 +58,8 @@ func main() {
 		api.PUT("/expenses/:id", expenseHandler.UpdateExpense)
 		api.POST("/expenses/batch", expenseHandler.CreateExpenses)
 		api.GET("/expenses", expenseHandler.GetExpenses)
+		api.DELETE("/expenses/:id", expenseHandler.DeleteExpense)
+		api.DELETE("/expenses/batch", expenseHandler.DeleteExpenses)
 
 		api.GET("/categories", categoryHandler.GetCategories)
 	}

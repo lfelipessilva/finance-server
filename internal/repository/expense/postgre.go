@@ -83,3 +83,17 @@ func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.E
 
 	return expenses, int(total), nil
 }
+
+func (r *postgresRepository) Delete(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).
+		Model(&entity.Expense{}).
+		Where("id = ?", id).
+		Delete(&entity.Expense{}).Error
+}
+
+func (r *postgresRepository) DeleteBatch(ctx context.Context, ids []string) error {
+	return r.db.WithContext(ctx).
+		Model(&entity.Expense{}).
+		Where("id IN ?", ids).
+		Delete(&entity.Expense{}).Error
+}

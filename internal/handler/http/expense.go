@@ -87,6 +87,36 @@ func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
 	})
 }
 
+func (h *ExpenseHandler) DeleteExpense(c *gin.Context) {
+	id := c.Param("id")
+
+	err := h.uc.DeleteExpense(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
+}
+func (h *ExpenseHandler) DeleteExpenses(c *gin.Context) {
+	var body struct {
+		IDs []string `json:"ids"`
+	}
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request format"})
+		return
+	}
+
+	err := h.uc.DeleteExpenses(c.Request.Context(), body.IDs)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
+}
+
 func parseFilters(c *gin.Context) domain.ExpenseFilters {
 	var filters domain.ExpenseFilters
 
