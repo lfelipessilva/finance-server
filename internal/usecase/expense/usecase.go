@@ -7,6 +7,7 @@ import (
 	"finance/internal/repository/expense"
 	"finance/internal/repository/tag"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -68,6 +69,57 @@ func (uc *expenseUseCase) UpdateExpense(ctx context.Context, input UpdateExpense
 	}
 
 	return expense, nil
+}
+
+func (uc *expenseUseCase) UpdateExpenses(ctx context.Context, input UpdateExpenseInput, ids []string) ([]*entity.Expense, error) {
+	tags, err := uc.tagRepo.FindById(ctx, input.TagIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	expense := &entity.Expense{
+		Name:         input.Name,
+		OriginalName: input.Name,
+		Timestamp:    input.Timestamp,
+		CategoryID:   input.CategoryID,
+		Tags:         tags,
+		Bank:         input.Bank,
+		Card:         input.Card,
+		Value:        input.Value,
+	}
+
+	var expenses []*entity.Expense
+	for _, id := range ids {
+		expenseID, err := strconv.ParseUint(id, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+
+		expense := &entity.Expense{
+			ID:           uint(expenseID),
+			Name:         input.Name,
+			OriginalName: input.Name,
+			Timestamp:    input.Timestamp,
+			CategoryID:   input.CategoryID,
+			Tags:         tags,
+			Bank:         input.Bank,
+			Card:         input.Card,
+			Value:        input.Value,
+		}
+
+		// Validate each expense before adding to batch
+		if err := expense.Validate(); err != nil {
+			return nil, err
+		}
+
+		expenses = append(expenses, expense)
+	}
+
+	if err := uc.repo.UpdateBatch(ctx, expense, ids); err != nil {
+		return nil, err
+	}
+
+	return expenses, nil
 }
 
 func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExpenseInput) ([]*entity.Expense, error) {

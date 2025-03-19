@@ -38,6 +38,13 @@ func (r *postgresRepository) Update(ctx context.Context, expense *entity.Expense
 		Updates(expense).Error
 }
 
+func (r *postgresRepository) UpdateBatch(ctx context.Context, expense *entity.Expense, ids []string) error {
+	return r.db.WithContext(ctx).
+		Model(&entity.Expense{}).
+		Where("id IN ?", ids).
+		Updates(expense).Error
+}
+
 func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []*entity.Expense) ([]*entity.Expense, error) {
 	if err := r.db.WithContext(ctx).Create(&expenses).Error; err != nil {
 		return nil, err

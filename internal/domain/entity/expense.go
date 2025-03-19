@@ -26,8 +26,5 @@ func (e *Expense) Validate() error {
 	if e.Name == "" {
 		return errors.New("field 'name' is required")
 	}
-	if e.Timestamp.IsZero() {
-		return errors.New("field 'timestamp' must be a valid time")
-	}
 	return nil
 }

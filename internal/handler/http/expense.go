@@ -48,7 +48,27 @@ func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusAccepted, updatedExpense)
+	c.JSON(http.StatusOK, updatedExpense)
+}
+
+func (h *ExpenseHandler) UpdateExpenses(c *gin.Context) {
+	var body struct {
+		IDs    []string                   `json:"ids"`
+		Values expense.UpdateExpenseInput `json:"values"`
+	}
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request format"})
+		return
+	}
+
+	updatedExpesnes, err := h.uc.UpdateExpenses(c.Request.Context(), body.Values, body.IDs)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedExpesnes)
 }
 
 func (h *ExpenseHandler) CreateExpenses(c *gin.Context) {
@@ -98,6 +118,7 @@ func (h *ExpenseHandler) DeleteExpense(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{})
 }
+
 func (h *ExpenseHandler) DeleteExpenses(c *gin.Context) {
 	var body struct {
 		IDs []string `json:"ids"`

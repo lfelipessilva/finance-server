@@ -54,12 +54,13 @@ func main() {
 
 	api := router.Group("/api/v1")
 	{
-		api.POST("/expenses", expenseHandler.CreateExpense)
-		api.PUT("/expenses/:id", expenseHandler.UpdateExpense)
-		api.POST("/expenses/batch", expenseHandler.CreateExpenses)
 		api.GET("/expenses", expenseHandler.GetExpenses)
-		api.DELETE("/expenses/:id", expenseHandler.DeleteExpense)
+		api.POST("/expenses/batch", expenseHandler.CreateExpenses)
+		api.POST("/expenses", expenseHandler.CreateExpense)
+		api.PUT("/expenses/batch", expenseHandler.UpdateExpenses)
+		api.PUT("/expenses/:id", expenseHandler.UpdateExpense)
 		api.DELETE("/expenses/batch", expenseHandler.DeleteExpenses)
+		api.DELETE("/expenses/:id", expenseHandler.DeleteExpense)
 
 		api.GET("/categories", categoryHandler.GetCategories)
 	}
