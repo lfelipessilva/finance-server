@@ -78,13 +78,17 @@ func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.E
 		query = query.Where("timestamp <= ?", filters.TimestampEnd)
 	}
 
+	if filters.OrderBy != "" && filters.OrderDirection != "" {
+		query = query.Order(filters.OrderBy + " " + filters.OrderDirection)
+	}
+
 	var total int64
 	if err := query.Model(&entity.Expense{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
 	offset := (filters.Page - 1) * filters.PageSize
-	if err := query.Offset(offset).Limit(filters.PageSize).Preload("Tags").Preload("Category").Find(&expenses).Order("timestamp ASC").Error; err != nil {
+	if err := query.Offset(offset).Limit(filters.PageSize).Preload("Tags").Preload("Category").Find(&expenses).Error; err != nil {
 		return nil, 0, err
 	}
 

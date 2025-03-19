@@ -107,11 +107,6 @@ func (uc *expenseUseCase) UpdateExpenses(ctx context.Context, input UpdateExpens
 			Value:        input.Value,
 		}
 
-		// Validate each expense before adding to batch
-		if err := expense.Validate(); err != nil {
-			return nil, err
-		}
-
 		expenses = append(expenses, expense)
 	}
 

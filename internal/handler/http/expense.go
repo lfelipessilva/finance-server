@@ -156,5 +156,12 @@ func parseFilters(c *gin.Context) domain.ExpenseFilters {
 	filters.Page = pageInt
 	filters.PageSize = pageSizeInt
 
+	if orderBy := c.Query("order_by"); orderBy != "" {
+		filters.OrderBy = orderBy
+	}
+	if orderDirection := c.Query("order_direction"); orderDirection != "" {
+		filters.OrderDirection = orderDirection
+	}
+
 	return filters
 }

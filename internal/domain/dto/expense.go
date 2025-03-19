@@ -6,4 +6,6 @@ type ExpenseFilters struct {
 	TimestampEnd   string
 	Page           int
 	PageSize       int
+	OrderBy        string
+	OrderDirection string
 }
