@@ -8,6 +8,7 @@ import (
 	tagRepo "finance/internal/repository/tag"
 	catUC "finance/internal/usecase/category"
 	expUC "finance/internal/usecase/expense"
+	tagUC "finance/internal/usecase/tag"
 
 	"finance/pkg/database"
 	"fmt"
@@ -29,6 +30,8 @@ func main() {
 	}
 
 	tagRepository := tagRepo.NewPostgresRepository(db)
+	tagUseCase := tagUC.NewTagUseCse(tagRepository)
+	tagHandler := http.NewTagHandler(tagUseCase)
 
 	expenseRepository := expRepo.NewPostgresRepository(db)
 	expenseUseCase := expUC.NewExpenseUseCase(expenseRepository, tagRepository)
@@ -63,6 +66,8 @@ func main() {
 		api.DELETE("/expenses/:id", expenseHandler.DeleteExpense)
 
 		api.GET("/categories", categoryHandler.GetCategories)
+
+		api.GET("/tags", tagHandler.GetTags)
 	}
 
 	if err := router.Run(":8080"); err != nil {

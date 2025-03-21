@@ -16,7 +16,7 @@ func NewTagHandler(uc tag.UseCase) *TagHandler {
 	return &TagHandler{uc: uc}
 }
 
-func (h *TagHandler) GetCategories(c *gin.Context) {
+func (h *TagHandler) GetTags(c *gin.Context) {
 	var filters domain.TagFilters
 	filters.Name = c.Query("name")
 
