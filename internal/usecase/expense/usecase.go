@@ -56,13 +56,14 @@ func (uc *expenseUseCase) UpdateExpense(ctx context.Context, input UpdateExpense
 		return nil, err
 	}
 	expense := &entity.Expense{
-		Name:       input.Name,
-		Timestamp:  input.Timestamp,
-		CategoryID: input.CategoryID,
-		Tags:       tags,
-		Bank:       input.Bank,
-		Card:       input.Card,
-		Value:      input.Value,
+		Name:        input.Name,
+		Description: input.Description,
+		Timestamp:   input.Timestamp,
+		CategoryID:  input.CategoryID,
+		Tags:        tags,
+		Bank:        input.Bank,
+		Card:        input.Card,
+		Value:       input.Value,
 	}
 
 	if err := uc.repo.Update(ctx, expense, id); err != nil {

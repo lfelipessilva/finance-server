@@ -149,6 +149,12 @@ func parseFilters(c *gin.Context) domain.ExpenseFilters {
 	if timestampEnd := c.Query("timestamp_end"); timestampEnd != "" {
 		filters.TimestampEnd = timestampEnd
 	}
+	if name := c.Query("name"); name != "" {
+		filters.Name = name
+	}
+	if category := c.Query("category"); category != "" {
+		filters.Category = category
+	}
 
 	page := c.DefaultQuery("page", "1")
 	pageSize := c.DefaultQuery("page_size", "50")
@@ -161,6 +167,7 @@ func parseFilters(c *gin.Context) domain.ExpenseFilters {
 	if orderBy := c.Query("order_by"); orderBy != "" {
 		filters.OrderBy = orderBy
 	}
+
 	if orderDirection := c.Query("order_direction"); orderDirection != "" {
 		filters.OrderDirection = orderDirection
 	}

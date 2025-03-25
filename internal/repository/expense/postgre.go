@@ -4,6 +4,7 @@ import (
 	"context"
 	domain "finance/internal/domain/dto"
 	"finance/internal/domain/entity"
+	"strconv"
 
 	"gorm.io/gorm"
 )
@@ -32,17 +33,63 @@ func (r *postgresRepository) Create(ctx context.Context, expense *entity.Expense
 }
 
 func (r *postgresRepository) Update(ctx context.Context, expense *entity.Expense, id string) error {
-	return r.db.WithContext(ctx).
-		Model(&entity.Expense{}).
-		Where("id = ?", id).
-		Updates(expense).Error
+	expenseID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Model(&entity.Expense{}).
+			Where("id = ?", id).
+			Updates(expense).Error; err != nil {
+			return err
+		}
+
+		expenseToUpdate := &entity.Expense{ID: uint(expenseID)}
+
+		if err := tx.Model(expenseToUpdate).
+			Association("Tags").
+			Replace(expense.Tags); err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func (r *postgresRepository) UpdateBatch(ctx context.Context, expense *entity.Expense, ids []string) error {
-	return r.db.WithContext(ctx).
-		Model(&entity.Expense{}).
-		Where("id IN ?", ids).
-		Updates(expense).Error
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		expenseIDs := make([]uint, 0, len(ids))
+		for _, id := range ids {
+			parsedID, err := strconv.ParseUint(id, 10, 64)
+			if err != nil {
+				return err
+			}
+			expenseIDs = append(expenseIDs, uint(parsedID))
+		}
+
+		if err := tx.Model(&entity.Expense{}).
+			Where("id IN ?", ids).
+			Updates(expense).Error; err != nil {
+			return err
+		}
+
+		for _, expenseID := range expenseIDs {
+			target := &entity.Expense{ID: expenseID}
+
+			if err := tx.Model(target).Association("Tags").Clear(); err != nil {
+				return err
+			}
+
+			if len(expense.Tags) > 0 {
+				if err := tx.Model(target).Association("Tags").Append(expense.Tags); err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
 }
 
 func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []*entity.Expense) ([]*entity.Expense, error) {
@@ -76,6 +123,14 @@ func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.E
 
 	if filters.TimestampEnd != "" {
 		query = query.Where("timestamp <= ?", filters.TimestampEnd)
+	}
+
+	if filters.Name != "" {
+		query = query.Where("name ILIKE ?", "%"+filters.Name+"%")
+	}
+
+	if filters.Category != "" {
+		query = query.Where("category_id = ?", filters.Category)
 	}
 
 	if filters.OrderBy != "" && filters.OrderDirection != "" {
