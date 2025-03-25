@@ -189,7 +189,7 @@ func (uc *expenseUseCase) CreateExpenses(ctx context.Context, inputs []CreateExp
 	return created, nil
 }
 
-func (uc *expenseUseCase) GetExpenses(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, error) {
+func (uc *expenseUseCase) GetExpenses(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, int, error) {
 	return uc.repo.FindByFilters(ctx, filters)
 }
 

@@ -113,9 +113,9 @@ func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []*entity
 	return createdExpenses, nil
 }
 
-func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, error) {
+func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, int, error) {
 	var expenses []entity.Expense
-	query := r.db.WithContext(ctx)
+	query := r.db.WithContext(ctx).Session(&gorm.Session{})
 
 	if filters.TimestampStart != "" {
 		query = query.Where("timestamp >= ?", filters.TimestampStart)
@@ -133,21 +133,27 @@ func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.E
 		query = query.Where("category_id = ?", filters.Category)
 	}
 
-	if filters.OrderBy != "" && filters.OrderDirection != "" {
-		query = query.Order(filters.OrderBy + " " + filters.OrderDirection)
+	var sum int64
+	err := query.Session(&gorm.Session{}).Model(&entity.Expense{}).Select("COALESCE(SUM(value), 0) AS sum").Scan(&sum).Error
+	if err != nil {
+		return nil, 0, 0, err
 	}
 
 	var total int64
 	if err := query.Model(&entity.Expense{}).Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, 0, err
+	}
+
+	if filters.OrderBy != "" && filters.OrderDirection != "" {
+		query = query.Order(filters.OrderBy + " " + filters.OrderDirection)
 	}
 
 	offset := (filters.Page - 1) * filters.PageSize
 	if err := query.Offset(offset).Limit(filters.PageSize).Preload("Tags").Preload("Category").Find(&expenses).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, 0, err
 	}
 
-	return expenses, int(total), nil
+	return expenses, int(total), int(sum), nil
 }
 
 func (r *postgresRepository) Delete(ctx context.Context, id string) error {

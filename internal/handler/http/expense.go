@@ -93,7 +93,7 @@ func (h *ExpenseHandler) CreateExpenses(c *gin.Context) {
 func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
 	filters := parseFilters(c)
 
-	expenses, total, err := h.uc.GetExpenses(c.Request.Context(), filters)
+	expenses, total, sum, err := h.uc.GetExpenses(c.Request.Context(), filters)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -101,6 +101,7 @@ func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": expenses,
+		"sum":  sum,
 		"summary": gin.H{
 			"total":     total,
 			"page":      filters.Page,
