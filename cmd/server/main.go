@@ -58,6 +58,7 @@ func main() {
 	api := router.Group("/api/v1")
 	{
 		api.GET("/expenses", expenseHandler.GetExpenses)
+		api.GET("/expenses/group", expenseHandler.GetExpensesByGroup)
 		api.POST("/expenses/batch", expenseHandler.CreateExpenses)
 		api.POST("/expenses", expenseHandler.CreateExpense)
 		api.PUT("/expenses/batch", expenseHandler.UpdateExpenses)

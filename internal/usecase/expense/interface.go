@@ -13,6 +13,7 @@ type UseCase interface {
 	UpdateExpenses(ctx context.Context, input UpdateExpenseInput, ids []string) ([]*entity.Expense, error)
 	CreateExpenses(ctx context.Context, inputs []CreateExpenseInput) ([]*entity.Expense, error)
 	GetExpenses(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, int, error)
+	GetExpensesByGroup(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByGroup, error)
 	DeleteExpense(ctx context.Context, id string) error
 	DeleteExpenses(ctx context.Context, ids []string) error
 }

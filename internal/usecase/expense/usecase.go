@@ -193,6 +193,10 @@ func (uc *expenseUseCase) GetExpenses(ctx context.Context, filters domain.Expens
 	return uc.repo.FindByFilters(ctx, filters)
 }
 
+func (uc *expenseUseCase) GetExpensesByGroup(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByGroup, error) {
+	return uc.repo.GroupByCategory(ctx, filters)
+}
+
 func (uc *expenseUseCase) DeleteExpense(ctx context.Context, id string) error {
 	err := uc.repo.Delete(ctx, id)
 	if err != nil {

@@ -156,6 +156,43 @@ func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.E
 	return expenses, int(total), int(sum), nil
 }
 
+func (r *postgresRepository) GroupByCategory(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByGroup, error) {
+	var groups []entity.ExpenseByGroup
+
+	query := r.db.WithContext(ctx).Table("expenses AS e").
+		Select("e.category_id, c.name AS category_name, SUM(e.value) AS total_amount").
+		Joins("JOIN categories c ON e.category_id = c.id")
+
+	if filters.TimestampStart != "" {
+		query = query.Where("e.timestamp >= ?", filters.TimestampStart)
+	}
+
+	if filters.TimestampEnd != "" {
+		query = query.Where("e.timestamp <= ?", filters.TimestampEnd)
+	}
+
+	if filters.Category != "" {
+		query = query.Where("e.category_id = ?", filters.Category)
+	}
+
+	if filters.Name != "" {
+		query = query.Where("e.name ILIKE ?", "%"+filters.Name+"%")
+	}
+
+	if len(filters.TagIds) > 0 {
+		query = query.Where("et.tag_id IN ?", filters.TagIds)
+	}
+
+	query = query.Group("e.category_id, c.name")
+
+	err := query.Scan(&groups).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return groups, nil
+}
+
 func (r *postgresRepository) Delete(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).
 		Model(&entity.Expense{}).

@@ -5,6 +5,7 @@ type ExpenseFilters struct {
 	TimestampStart string
 	TimestampEnd   string
 	Name           string
+	TagIds         []uint
 	Page           int
 	PageSize       int
 	OrderBy        string
