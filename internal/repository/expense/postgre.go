@@ -4,6 +4,7 @@ import (
 	"context"
 	domain "finance/internal/domain/dto"
 	"finance/internal/domain/entity"
+	"fmt"
 	"strconv"
 
 	"gorm.io/gorm"
@@ -191,6 +192,56 @@ func (r *postgresRepository) GroupByCategory(ctx context.Context, filters domain
 	}
 
 	return groups, nil
+}
+
+func (r *postgresRepository) GroupByDate(
+	ctx context.Context,
+	filters domain.ExpenseFilters,
+	unit string,
+) ([]entity.ExpenseByDate, error) {
+	var results []entity.ExpenseByDate
+
+	validUnits := map[string]bool{
+		"DAY":   true,
+		"MONTH": true,
+		"YEAR":  true,
+	}
+	if !validUnits[unit] {
+		return nil, fmt.Errorf("invalid group unit: %s", unit)
+	}
+
+	date := fmt.Sprintf("EXTRACT(%s FROM e.timestamp)", unit)
+
+	query := r.db.WithContext(ctx).
+		Table("expenses AS e").
+		Select(fmt.Sprintf("%s AS timestamp, SUM(e.value) AS total_value", date))
+
+	if filters.TimestampStart != "" {
+		query = query.Where("e.timestamp >= ?", filters.TimestampStart)
+	}
+
+	if filters.TimestampEnd != "" {
+		query = query.Where("e.timestamp <= ?", filters.TimestampEnd)
+	}
+
+	if filters.Category != "" {
+		query = query.Where("e.category_id = ?", filters.Category)
+	}
+
+	if filters.Name != "" {
+		query = query.Where("e.name ILIKE ?", "%"+filters.Name+"%")
+	}
+
+	query = query.
+		Group(date).
+		Order(fmt.Sprintf("%s ASC", date))
+
+	err := query.Scan(&results).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 func (r *postgresRepository) Delete(ctx context.Context, id string) error {

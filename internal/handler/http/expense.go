@@ -124,6 +124,48 @@ func (h *ExpenseHandler) GetExpensesByGroup(c *gin.Context) {
 	})
 }
 
+func (h *ExpenseHandler) GetExpensesByDay(c *gin.Context) {
+	filters := parseFilters(c)
+
+	groups, err := h.uc.GetExpensesByDay(c.Request.Context(), filters)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": groups,
+	})
+}
+
+func (h *ExpenseHandler) GetExpensesByMonth(c *gin.Context) {
+	filters := parseFilters(c)
+
+	groups, err := h.uc.GetExpensesByMonth(c.Request.Context(), filters)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": groups,
+	})
+}
+
+func (h *ExpenseHandler) GetExpensesByYear(c *gin.Context) {
+	filters := parseFilters(c)
+
+	groups, err := h.uc.GetExpensesByYear(c.Request.Context(), filters)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": groups,
+	})
+}
+
 func (h *ExpenseHandler) DeleteExpense(c *gin.Context) {
 	id := c.Param("id")
 

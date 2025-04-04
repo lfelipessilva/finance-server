@@ -14,6 +14,9 @@ type UseCase interface {
 	CreateExpenses(ctx context.Context, inputs []CreateExpenseInput) ([]*entity.Expense, error)
 	GetExpenses(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, int, error)
 	GetExpensesByGroup(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByGroup, error)
+	GetExpensesByDay(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByDate, error)
+	GetExpensesByMonth(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByDate, error)
+	GetExpensesByYear(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByDate, error)
 	DeleteExpense(ctx context.Context, id string) error
 	DeleteExpenses(ctx context.Context, ids []string) error
 }

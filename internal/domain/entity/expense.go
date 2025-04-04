@@ -35,3 +35,8 @@ type ExpenseByGroup struct {
 	TotalAmount   float64 `json:"total_amount"`
 	CategoryColor string  `json:"category_color"`
 }
+
+type ExpenseByDate struct {
+	Timestamp  string  `json:"timestamp"`
+	TotalValue float64 `json:"total_value"`
+}

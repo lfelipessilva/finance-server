@@ -59,9 +59,9 @@ func main() {
 	{
 		api.GET("/expenses", expenseHandler.GetExpenses)
 		api.GET("/expenses/category", expenseHandler.GetExpensesByGroup)
-		api.GET("/expenses/day", expenseHandler.GetExpensesByGroup)
-		api.GET("/expenses/month", expenseHandler.GetExpensesByGroup)
-		api.GET("/expenses/year", expenseHandler.GetExpensesByGroup)
+		api.GET("/expenses/day", expenseHandler.GetExpensesByDay)
+		api.GET("/expenses/month", expenseHandler.GetExpensesByMonth)
+		api.GET("/expenses/year", expenseHandler.GetExpensesByYear)
 		api.POST("/expenses/batch", expenseHandler.CreateExpenses)
 		api.POST("/expenses", expenseHandler.CreateExpense)
 		api.PUT("/expenses/batch", expenseHandler.UpdateExpenses)
