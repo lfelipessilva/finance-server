@@ -30,7 +30,8 @@ func (e *Expense) Validate() error {
 }
 
 type ExpenseByGroup struct {
-	CategoryID   uint    `json:"category_id"`
-	CategoryName string  `json:"category_name"`
-	TotalAmount  float64 `json:"total_amount"`
+	CategoryID    uint    `json:"category_id"`
+	CategoryName  string  `json:"category_name"`
+	TotalAmount   float64 `json:"total_amount"`
+	CategoryColor string  `json:"category_color"`
 }

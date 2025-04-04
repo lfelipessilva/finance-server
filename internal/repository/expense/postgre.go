@@ -160,7 +160,7 @@ func (r *postgresRepository) GroupByCategory(ctx context.Context, filters domain
 	var groups []entity.ExpenseByGroup
 
 	query := r.db.WithContext(ctx).Table("expenses AS e").
-		Select("e.category_id, c.name AS category_name, SUM(e.value) AS total_amount").
+		Select("e.category_id, c.name AS category_name, c.color AS category_color, SUM(e.value) AS total_amount").
 		Joins("JOIN categories c ON e.category_id = c.id")
 
 	if filters.TimestampStart != "" {
@@ -183,7 +183,7 @@ func (r *postgresRepository) GroupByCategory(ctx context.Context, filters domain
 		query = query.Where("et.tag_id IN ?", filters.TagIds)
 	}
 
-	query = query.Group("e.category_id, c.name")
+	query = query.Group("e.category_id, c.name, c.color")
 
 	err := query.Scan(&groups).Error
 	if err != nil {
