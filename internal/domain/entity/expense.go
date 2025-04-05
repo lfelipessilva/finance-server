@@ -32,11 +32,13 @@ func (e *Expense) Validate() error {
 type ExpenseByGroup struct {
 	CategoryID    uint    `json:"category_id"`
 	CategoryName  string  `json:"category_name"`
-	TotalAmount   float64 `json:"total_amount"`
 	CategoryColor string  `json:"category_color"`
+	TotalValue    float64 `json:"total_value"`
 }
 
 type ExpenseByDate struct {
-	Timestamp  string  `json:"timestamp"`
-	TotalValue float64 `json:"total_value"`
+	Timestamp     string  `json:"timestamp"`
+	CategoryName  string  `json:"category_name"`
+	CategoryColor string  `json:"category_color"`
+	TotalValue    float64 `json:"total_value"`
 }

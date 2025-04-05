@@ -161,7 +161,7 @@ func (r *postgresRepository) GroupByCategory(ctx context.Context, filters domain
 	var groups []entity.ExpenseByGroup
 
 	query := r.db.WithContext(ctx).Table("expenses AS e").
-		Select("e.category_id, c.name AS category_name, c.color AS category_color, SUM(e.value) AS total_amount").
+		Select("e.category_id, c.name AS category_name, c.color AS category_color, SUM(e.value) AS total_value").
 		Joins("JOIN categories c ON e.category_id = c.id")
 
 	if filters.TimestampStart != "" {
@@ -201,20 +201,18 @@ func (r *postgresRepository) GroupByDate(
 ) ([]entity.ExpenseByDate, error) {
 	var results []entity.ExpenseByDate
 
-	validUnits := map[string]bool{
-		"DAY":   true,
-		"MONTH": true,
-		"YEAR":  true,
-	}
-	if !validUnits[unit] {
+	switch unit {
+	case "DAY", "MONTH", "YEAR":
+	default:
 		return nil, fmt.Errorf("invalid group unit: %s", unit)
 	}
 
-	date := fmt.Sprintf("EXTRACT(%s FROM e.timestamp)", unit)
+	groupByRule := fmt.Sprintf("EXTRACT(%s FROM e.timestamp)", unit)
 
 	query := r.db.WithContext(ctx).
 		Table("expenses AS e").
-		Select(fmt.Sprintf("%s AS timestamp, SUM(e.value) AS total_value", date))
+		Select(fmt.Sprintf("%s AS timestamp, c.name AS category_name, c.color AS category_color, SUM(e.value) AS total_value", groupByRule)).
+		Joins("JOIN categories c ON e.category_id = c.id")
 
 	if filters.TimestampStart != "" {
 		query = query.Where("e.timestamp >= ?", filters.TimestampStart)
@@ -233,11 +231,10 @@ func (r *postgresRepository) GroupByDate(
 	}
 
 	query = query.
-		Group(date).
-		Order(fmt.Sprintf("%s ASC", date))
+		Group(fmt.Sprintf("c.name, c.color, %s", groupByRule)).
+		Order(fmt.Sprintf("%s ASC", groupByRule))
 
-	err := query.Scan(&results).Error
-	if err != nil {
+	if err := query.Scan(&results).Error; err != nil {
 		return nil, err
 	}
 
