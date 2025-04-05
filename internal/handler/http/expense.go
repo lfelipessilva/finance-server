@@ -110,10 +110,24 @@ func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
 	})
 }
 
-func (h *ExpenseHandler) GetExpensesByGroup(c *gin.Context) {
+func (h *ExpenseHandler) GetExpensesByCategory(c *gin.Context) {
 	filters := parseFilters(c)
 
-	groups, err := h.uc.GetExpensesByGroup(c.Request.Context(), filters)
+	groups, err := h.uc.GetExpensesByCategory(c.Request.Context(), filters)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": groups,
+	})
+}
+
+func (h *ExpenseHandler) GetExpensesByDate(c *gin.Context) {
+	filters := parseFilters(c)
+
+	groups, err := h.uc.GetExpensesByDate(c.Request.Context(), filters)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

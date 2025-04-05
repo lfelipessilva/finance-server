@@ -58,7 +58,8 @@ func main() {
 	api := router.Group("/api/v1")
 	{
 		api.GET("/expenses", expenseHandler.GetExpenses)
-		api.GET("/expenses/category", expenseHandler.GetExpensesByGroup)
+		api.GET("/expenses/category", expenseHandler.GetExpensesByCategory)
+		api.GET("/expenses/date", expenseHandler.GetExpensesByDate)
 		api.GET("/expenses/day", expenseHandler.GetExpensesByDay)
 		api.GET("/expenses/month", expenseHandler.GetExpensesByMonth)
 		api.GET("/expenses/year", expenseHandler.GetExpensesByYear)

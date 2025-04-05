@@ -194,7 +194,7 @@ func (r *postgresRepository) GroupByCategory(ctx context.Context, filters domain
 	return groups, nil
 }
 
-func (r *postgresRepository) GroupByDate(
+func (r *postgresRepository) GroupByDateUnit(
 	ctx context.Context,
 	filters domain.ExpenseFilters,
 	unit string,
@@ -233,6 +233,44 @@ func (r *postgresRepository) GroupByDate(
 	query = query.
 		Group(fmt.Sprintf("c.name, c.color, %s", groupByRule)).
 		Order(fmt.Sprintf("%s ASC", groupByRule))
+
+	if err := query.Scan(&results).Error; err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+func (r *postgresRepository) GroupByDate(
+	ctx context.Context,
+	filters domain.ExpenseFilters,
+) ([]entity.ExpenseByDate, error) {
+	var results []entity.ExpenseByDate
+
+	query := r.db.WithContext(ctx).
+		Table("expenses AS e").
+		Select(fmt.Sprintf("to_char(e.timestamp, 'DD-MM-YYYY') AS timestamp, c.name AS category_name, c.color AS category_color, SUM(e.value) AS total_value")).
+		Joins("JOIN categories c ON e.category_id = c.id")
+
+	if filters.TimestampStart != "" {
+		query = query.Where("e.timestamp >= ?", filters.TimestampStart)
+	}
+
+	if filters.TimestampEnd != "" {
+		query = query.Where("e.timestamp <= ?", filters.TimestampEnd)
+	}
+
+	if filters.Category != "" {
+		query = query.Where("e.category_id = ?", filters.Category)
+	}
+
+	if filters.Name != "" {
+		query = query.Where("e.name ILIKE ?", "%"+filters.Name+"%")
+	}
+
+	query = query.
+		Group(fmt.Sprintf("c.name, c.color, to_char(e.timestamp, 'DD-MM-YYYY'), e.timestamp")).
+		Order(fmt.Sprintf("e.timestamp ASC"))
 
 	if err := query.Scan(&results).Error; err != nil {
 		return nil, err

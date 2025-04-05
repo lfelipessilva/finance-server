@@ -193,20 +193,24 @@ func (uc *expenseUseCase) GetExpenses(ctx context.Context, filters domain.Expens
 	return uc.repo.FindByFilters(ctx, filters)
 }
 
-func (uc *expenseUseCase) GetExpensesByGroup(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByGroup, error) {
+func (uc *expenseUseCase) GetExpensesByCategory(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByGroup, error) {
 	return uc.repo.GroupByCategory(ctx, filters)
 }
 
+func (uc *expenseUseCase) GetExpensesByDate(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByDate, error) {
+	return uc.repo.GroupByDate(ctx, filters)
+}
+
 func (uc *expenseUseCase) GetExpensesByDay(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByDate, error) {
-	return uc.repo.GroupByDate(ctx, filters, "DAY")
+	return uc.repo.GroupByDateUnit(ctx, filters, "DAY")
 }
 
 func (uc *expenseUseCase) GetExpensesByMonth(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByDate, error) {
-	return uc.repo.GroupByDate(ctx, filters, "MONTH")
+	return uc.repo.GroupByDateUnit(ctx, filters, "MONTH")
 }
 
 func (uc *expenseUseCase) GetExpensesByYear(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByDate, error) {
-	return uc.repo.GroupByDate(ctx, filters, "YEAR")
+	return uc.repo.GroupByDateUnit(ctx, filters, "YEAR")
 }
 
 func (uc *expenseUseCase) DeleteExpense(ctx context.Context, id string) error {
