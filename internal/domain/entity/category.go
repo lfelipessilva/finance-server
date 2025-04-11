@@ -9,6 +9,7 @@ type Category struct {
 	Name  string `json:"name"`
 	Color string `json:"color"`
 	Icon  string `json:"icon"`
+	Url  string `json:"url"`
 }
 
 func (e *Category) Validate() error {
