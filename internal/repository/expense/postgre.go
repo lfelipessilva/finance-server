@@ -186,6 +186,10 @@ func (r *postgresRepository) GroupByCategory(ctx context.Context, filters domain
 
 	query = query.Group("e.category_id, c.name, c.color")
 
+	if filters.OrderBy != "" && filters.OrderDirection != "" {
+		query = query.Order(filters.OrderBy + " " + filters.OrderDirection)
+	}
+
 	err := query.Scan(&groups).Error
 	if err != nil {
 		return nil, err
