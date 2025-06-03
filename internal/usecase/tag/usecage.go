@@ -11,7 +11,7 @@ type tagUseCase struct {
 	repo tag.Repository
 }
 
-func NewTagUseCse(repo tag.Repository) UseCase {
+func NewTagUseCase(repo tag.Repository) UseCase {
 	return &tagUseCase{repo: repo}
 }
 
