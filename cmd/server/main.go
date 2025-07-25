@@ -54,6 +54,7 @@ func main() {
 	{
 		routes.ExpensesRoutes(api, db)
 		routes.UserRoutes(api, db)
+		routes.AuthRoutes(api, db)
 		api.GET("/categories", categoryHandler.GetCategories)
 
 		api.GET("/tags", tagHandler.GetTags)

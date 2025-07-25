@@ -3,6 +3,8 @@ package routes
 import (
 	"finance/config"
 	"finance/internal/handler/http"
+	userRepo "finance/internal/repository/user"
+	userUC "finance/internal/usecase/user"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -16,7 +18,9 @@ func AuthRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		panic("failed to load config: " + err.Error())
 	}
 
-	authUseCase := usecase.NewAuthUseCase(cfg.JWTSecret)
+	userRepository := userRepo.NewPostgresRepository(db)
+	userUseCase := userUC.NewUserUseCse(userRepository)
+	authUseCase := usecase.NewAuthUseCase(cfg.JWTSecret, cfg.GoogleOAuthClientID, userUseCase)
 	authHandler := http.NewAuthHandler(authUseCase)
 
 	router.POST("/auth", authHandler.Authenticate)

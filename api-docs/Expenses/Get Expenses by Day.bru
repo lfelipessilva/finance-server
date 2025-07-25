@@ -1,0 +1,13 @@
+meta {
+  name: Get Expenses by Day
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/expenses/day
+  query: {
+    day: 15
+  }
+  body: none
+} 

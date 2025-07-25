@@ -1,0 +1,14 @@
+meta {
+  name: Delete Expenses Batch
+  type: http
+  seq: 12
+}
+
+delete {
+  url: {{baseUrl}}/expenses/batch
+  body: json {
+    {
+      "ids": [1, 2, 3]
+    }
+  }
+} 

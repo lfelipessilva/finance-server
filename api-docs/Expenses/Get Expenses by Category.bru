@@ -1,0 +1,13 @@
+meta {
+  name: Get Expenses by Category
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/expenses/category
+  query: {
+    category_id: 1
+  }
+  body: none
+} 

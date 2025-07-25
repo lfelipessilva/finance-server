@@ -1,0 +1,17 @@
+meta {
+  name: Create Expense
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/expenses
+  body: json {
+    {
+      "description": "Sample expense",
+      "amount": 100.50,
+      "category_id": 1,
+      "date": "2024-01-15"
+    }
+  }
+} 

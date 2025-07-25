@@ -1,10 +1,8 @@
 package http
 
 import (
-	"context"
 	"finance/internal/usecase/auth"
-
-	"google.golang.org/api/idtoken"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,23 +16,21 @@ func NewAuthHandler(uc auth.UseCase) *AuthHandler {
 }
 
 func (h *AuthHandler) Authenticate(c *gin.Context) {
-	// verifyGoogleToken()
-	// var email = c.Query("email")
-
-	// users, err := h.uc.Register()
-
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 	return
-	// }
-
-	// c.JSON(http.StatusOK, users)
-}
-
-func verifyGoogleToken(ctx context.Context, idToken string, clientId string) (*idtoken.Payload, error) {
-	payload, err := idtoken.Validate(ctx, idToken, clientId)
-	if err != nil {
-		return nil, err
+	var input auth.AuthenticateInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	return payload, nil
+
+	user, token, err := h.uc.AuthenticateWithGoogle(c.Request.Context(), input)
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication failed: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"user":         user,
+		"access_token": token,
+	})
 }

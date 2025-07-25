@@ -1,21 +1,79 @@
 meta {
   name: Create User
   type: http
-  seq: 1
+  seq: 2
 }
 
 post {
-  url: {{url}}/user
-  body: json
-  auth: inherit
+  url: {{baseUrl}}/user
+  body: json {
+    {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "password": "password123"
+    }
+  }
 }
 
 body:json {
   {
-    "email": "luis.t@gmail.com",
-    "name": "Luís Felipe",
+    "email": "user@example.com",
+    "name": "John Doe",
     "provider": "google",
-    "providerUserId": "12345",
-    "profilePicture": "url"
+    "provider_user_id": "123456789",
+    "profile_picture": "https://lh3.googleusercontent.com/a/ACg8ocJ..."
   }
 }
+
+docs {
+  # Create User
+
+  This endpoint creates a new user account and returns an access token.
+
+  ## Request Body Parameters
+
+  | Parameter | Type | Required | Description |
+  |-----------|------|----------|-------------|
+  | email | string | ✅ | User's email address |
+  | name | string | ✅ | User's full name |
+  | provider | string | ✅ | Authentication provider (e.g., "google", "facebook") |
+  | provider_user_id | string | ✅ | Unique ID from the provider |
+  | profile_picture | string | ❌ | URL to user's profile picture |
+
+  ## Example Responses
+
+  ### Success Response (201 Created)
+  ```json
+  {
+    "user": {
+      "id": 1,
+      "email": "user@example.com",
+      "name": "John Doe",
+      "provider": "google",
+      "provider_user_id": "123456789",
+      "profile_picture": "https://lh3.googleusercontent.com/a/ACg8ocJ..."
+    },
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJleHAiOjE3MzU2ODgwMDB9..."
+  }
+  ```
+
+  ### Error Response (400 Bad Request)
+  ```json
+  {
+    "error": "Key: 'CreateUserInput.Email' Error:Field validation for 'Email' failed on the 'required' tag"
+  }
+  ```
+
+  ### Error Response (500 Internal Server Error)
+  ```json
+  {
+    "error": "Failed to create user: database error"
+  }
+  ```
+
+  ## Notes
+
+  - The access token is a JWT with 1-year expiration
+  - Store the access token securely for subsequent API calls
+  - Use the access token in the Authorization header: `Bearer <token>`
+} 

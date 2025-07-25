@@ -20,7 +20,7 @@ func UserRoutes(router *gin.RouterGroup, db *gorm.DB) {
 
 	userRepository := respository.NewPostgresRepository(db)
 	userUseCase := usecase.NewUserUseCse(userRepository)
-	authUseCase := authUC.NewAuthUseCase(cfg.JWTSecret)
+	authUseCase := authUC.NewAuthUseCase(cfg.JWTSecret, cfg.GoogleOAuthClientID, userUseCase)
 	userHandler := http.NewUserHandler(userUseCase, authUseCase)
 
 	router.GET("/user", userHandler.GetUsers)

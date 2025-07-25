@@ -1,0 +1,15 @@
+meta {
+  name: Authenticate
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth
+  body: json {
+    {
+      "email": "john@example.com",
+      "password": "password123"
+    }
+  }
+} 
