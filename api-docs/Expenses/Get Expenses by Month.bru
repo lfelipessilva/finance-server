@@ -1,0 +1,13 @@
+meta {
+  name: Get Expenses by Month
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/expenses/month
+  query: {
+    month: 1
+  }
+  body: none
+} 

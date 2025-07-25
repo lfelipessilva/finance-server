@@ -6,13 +6,14 @@ import (
 )
 
 type Config struct {
-	DBHost     string `env:"DB_HOST" envDefault:"localhost"`
-	DBPort     string `env:"DB_PORT" envDefault:"5432"`
-	DBUser     string `env:"DB_USER" envDefault:"postgres"`
-	DBPassword string `env:"DB_PASSWORD" envDefault:"postgres"`
-	DBName     string `env:"DB_NAME" envDefault:"finance"`
-	SSLMode    string `env:"SSL_MODE" envDefault:"disable"`
-	JWTSecret  string `env:"JWT_SECRET" envDefault:"your-secret-key"`
+	DBHost              string `env:"DB_HOST" envDefault:"localhost"`
+	DBPort              string `env:"DB_PORT" envDefault:"5432"`
+	DBUser              string `env:"DB_USER" envDefault:"postgres"`
+	DBPassword          string `env:"DB_PASSWORD" envDefault:"postgres"`
+	DBName              string `env:"DB_NAME" envDefault:"finance"`
+	SSLMode             string `env:"SSL_MODE" envDefault:"disable"`
+	JWTSecret           string `env:"JWT_SECRET" envDefault:"your-secret-key"`
+	GoogleOAuthClientID string `env:"GOOGLE_OAUTH_CLIENT_ID" envDefault:""`
 }
 
 func Load() (*Config, error) {

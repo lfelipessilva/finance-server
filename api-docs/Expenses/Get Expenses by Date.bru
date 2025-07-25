@@ -1,0 +1,13 @@
+meta {
+  name: Get Expenses by Date
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/expenses/date
+  query: {
+    date: 2024-01-15
+  }
+  body: none
+} 

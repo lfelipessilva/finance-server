@@ -1,0 +1,13 @@
+meta {
+  name: Get Expenses by Year
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/expenses/year
+  query: {
+    year: 2024
+  }
+  body: none
+} 

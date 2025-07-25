@@ -1,0 +1,27 @@
+meta {
+  name: Update Expenses Batch
+  type: http
+  seq: 10
+}
+
+put {
+  url: {{baseUrl}}/expenses/batch
+  body: json {
+    [
+      {
+        "id": 1,
+        "description": "Updated expense 1",
+        "amount": 100.00,
+        "category_id": 1,
+        "date": "2024-01-15"
+      },
+      {
+        "id": 2,
+        "description": "Updated expense 2",
+        "amount": 125.50,
+        "category_id": 2,
+        "date": "2024-01-16"
+      }
+    ]
+  }
+} 

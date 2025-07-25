@@ -1,0 +1,25 @@
+meta {
+  name: Create Expenses Batch
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/expenses/batch
+  body: json {
+    [
+      {
+        "description": "Expense 1",
+        "amount": 50.00,
+        "category_id": 1,
+        "date": "2024-01-15"
+      },
+      {
+        "description": "Expense 2",
+        "amount": 75.25,
+        "category_id": 2,
+        "date": "2024-01-16"
+      }
+    ]
+  }
+} 
