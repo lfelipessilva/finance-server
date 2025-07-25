@@ -10,8 +10,9 @@ type Config struct {
 	DBPort     string `env:"DB_PORT" envDefault:"5432"`
 	DBUser     string `env:"DB_USER" envDefault:"postgres"`
 	DBPassword string `env:"DB_PASSWORD" envDefault:"postgres"`
-	DBName     string `env:"DB_NAME" envDefault:"expense"`
-	SSLMode    string `env:"SSL_MODE" envDefault:"require"`
+	DBName     string `env:"DB_NAME" envDefault:"finance"`
+	SSLMode    string `env:"SSL_MODE" envDefault:"disable"`
+	JWTSecret  string `env:"JWT_SECRET" envDefault:"your-secret-key"`
 }
 
 func Load() (*Config, error) {
