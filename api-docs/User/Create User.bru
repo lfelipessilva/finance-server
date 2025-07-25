@@ -1,0 +1,21 @@
+meta {
+  name: Create User
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/user
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "luis.t@gmail.com",
+    "name": "Luís Felipe",
+    "provider": "google",
+    "providerUserId": "12345",
+    "profilePicture": "url"
+  }
+}
