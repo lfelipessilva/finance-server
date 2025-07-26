@@ -49,39 +49,36 @@ func (uc *authUseCase) AuthenticateWithGoogle(ctx context.Context, input Authent
 
 	email := payload.Claims["email"].(string)
 	name := payload.Claims["name"].(string)
-	picture := ""
-	if pic, ok := payload.Claims["picture"].(string); ok {
-		picture = pic
-	}
+	picture := payload.Claims["picture"].(string)
 	sub := payload.Subject
 
-	existingUser, err := uc.userUseCase.GetUserByEmail(ctx, email)
+	foundUser, err := uc.userUseCase.GetUserByEmail(ctx, email)
 
-	if err == nil {
-		token, err := uc.GenerateToken(existingUser)
+	if err != nil {
+		return nil, "", err
+	}
+
+	var userPtr *entity.User
+	if foundUser.ID == 0 {
+		createInput := user.CreateUserInput{
+			Email:          email,
+			Name:           name,
+			Provider:       "google",
+			ProviderUserID: sub,
+			ProfilePicture: picture,
+		}
+
+		userPtr, err = uc.userUseCase.CreateUser(ctx, createInput)
 		if err != nil {
 			return nil, "", err
 		}
-		return &existingUser, token, nil
+	} else {
+		userPtr = &foundUser
 	}
 
-	createInput := user.CreateUserInput{
-		Email:          email,
-		Name:           name,
-		Provider:       "google",
-		ProviderUserID: sub,
-		ProfilePicture: picture,
-	}
-
-	newUser, err := uc.userUseCase.CreateUser(ctx, createInput)
+	token, err := uc.GenerateToken(*userPtr)
 	if err != nil {
 		return nil, "", err
 	}
-
-	token, err := uc.GenerateToken(*newUser)
-	if err != nil {
-		return nil, "", err
-	}
-
-	return newUser, token, nil
+	return userPtr, token, nil
 }
