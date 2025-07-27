@@ -3,13 +3,8 @@ package main
 import (
 	"finance/cmd/server/routes"
 	"finance/config"
-	"finance/internal/handler/http"
 	"finance/internal/middleware"
-	catRepo "finance/internal/repository/category"
-	tagRepo "finance/internal/repository/tag"
 	userRepo "finance/internal/repository/user"
-	catUC "finance/internal/usecase/category"
-	tagUC "finance/internal/usecase/tag"
 	userUC "finance/internal/usecase/user"
 
 	"finance/pkg/database"
@@ -27,17 +22,10 @@ func main() {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
 		cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort, cfg.SSLMode)
 	db, err := database.NewPostgresConnection(dsn)
+
 	if err != nil {
 		panic("failed to connect database: " + err.Error())
 	}
-
-	tagRepository := tagRepo.NewPostgresRepository(db)
-	tagUseCase := tagUC.NewTagUseCase(tagRepository)
-	tagHandler := http.NewTagHandler(tagUseCase)
-
-	categoryRepository := catRepo.NewPostgresRepository(db)
-	categoryUseCase := catUC.NewCategoryUseCse(categoryRepository)
-	categoryHandler := http.NewCategoryHandler(categoryUseCase)
 
 	userRepository := userRepo.NewPostgresRepository(db)
 	userUseCase := userUC.NewUserUseCse(userRepository)
@@ -61,8 +49,8 @@ func main() {
 	{
 		// Public routes (no auth required)
 		routes.AuthRoutes(api, db)
-		api.GET("/categories", categoryHandler.GetCategories)
-		api.GET("/tags", tagHandler.GetTags)
+		routes.CategoriesRoutes(api, db)
+		routes.TagsRoutes(api, db)
 
 		// Protected routes (auth required)
 		protected := api.Group("")
