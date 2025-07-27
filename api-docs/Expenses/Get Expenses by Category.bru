@@ -5,9 +5,14 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/expenses/category
+  url: {{url}}/expenses/category
   query: {
     category_id: 1
   }
   body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
 } 

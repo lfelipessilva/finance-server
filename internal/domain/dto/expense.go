@@ -1,6 +1,7 @@
 package domain
 
 type ExpenseFilters struct {
+	UserID         uint
 	Category       string
 	TimestampStart string
 	TimestampEnd   string

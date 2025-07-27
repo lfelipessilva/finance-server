@@ -1,10 +1,14 @@
 meta {
   name: Get All Expenses
   type: http
-  seq: 1
 }
 
 get {
-  url: {{baseUrl}}/expenses
+  url: {{url}}/expenses
   body: none
-} 
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

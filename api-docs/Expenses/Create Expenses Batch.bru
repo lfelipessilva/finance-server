@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/expenses/batch
+  url: {{url}}/expenses/batch
   body: json {
     [
       {
@@ -22,4 +22,9 @@ post {
       }
     ]
   }
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
 } 

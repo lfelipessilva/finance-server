@@ -1,11 +1,10 @@
 meta {
   name: Create Expense
   type: http
-  seq: 7
 }
 
 post {
-  url: {{baseUrl}}/expenses
+  url: {{url}}/expenses
   body: json {
     {
       "description": "Sample expense",
@@ -14,4 +13,9 @@ post {
       "date": "2024-01-15"
     }
   }
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
 } 

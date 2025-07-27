@@ -5,9 +5,14 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/expenses/day
+  url: {{url}}/expenses/day
   query: {
     day: 15
   }
   body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
 } 

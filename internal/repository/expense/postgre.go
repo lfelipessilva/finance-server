@@ -118,6 +118,10 @@ func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.E
 	var expenses []entity.Expense
 	query := r.db.WithContext(ctx).Session(&gorm.Session{})
 
+	if filters.UserID != 0 {
+		query = query.Where("user_id = ?", filters.UserID)
+	}
+
 	if filters.TimestampStart != "" {
 		query = query.Where("timestamp >= ?", filters.TimestampStart)
 	}
@@ -163,6 +167,10 @@ func (r *postgresRepository) GroupByCategory(ctx context.Context, filters domain
 	query := r.db.WithContext(ctx).Table("expenses AS e").
 		Select("e.category_id, c.name AS category_name, c.color AS category_color, SUM(e.value) AS total_value").
 		Joins("JOIN categories c ON e.category_id = c.id")
+
+	if filters.UserID != 0 {
+		query = query.Where("e.user_id = ?", filters.UserID)
+	}
 
 	if filters.TimestampStart != "" {
 		query = query.Where("e.timestamp >= ?", filters.TimestampStart)
@@ -218,6 +226,10 @@ func (r *postgresRepository) GroupByDateUnit(
 		Select(fmt.Sprintf("%s AS timestamp, c.name AS category_name, c.color AS category_color, SUM(e.value) AS total_value", groupByRule)).
 		Joins("JOIN categories c ON e.category_id = c.id")
 
+	if filters.UserID != 0 {
+		query = query.Where("e.user_id = ?", filters.UserID)
+	}
+
 	if filters.TimestampStart != "" {
 		query = query.Where("e.timestamp >= ?", filters.TimestampStart)
 	}
@@ -255,6 +267,10 @@ func (r *postgresRepository) GroupByDate(
 		Table("expenses AS e").
 		Select(fmt.Sprintf("to_char(e.timestamp, 'DD-MM-YYYY') AS timestamp, c.name AS category_name, c.color AS category_color, SUM(e.value) AS total_value")).
 		Joins("JOIN categories c ON e.category_id = c.id")
+
+	if filters.UserID != 0 {
+		query = query.Where("e.user_id = ?", filters.UserID)
+	}
 
 	if filters.TimestampStart != "" {
 		query = query.Where("e.timestamp >= ?", filters.TimestampStart)

@@ -23,6 +23,7 @@ type UseCase interface {
 }
 
 type CreateExpenseInput struct {
+	UserID      uint
 	Name        string
 	CategoryID  *uint
 	Description string
@@ -34,6 +35,7 @@ type CreateExpenseInput struct {
 }
 
 type UpdateExpenseInput struct {
+	UserID      uint
 	Name        string
 	CategoryID  *uint
 	Description string

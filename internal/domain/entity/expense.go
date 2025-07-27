@@ -7,6 +7,7 @@ import (
 
 type Expense struct {
 	ID           uint      `gorm:"primaryKey" json:"id"`
+	UserID       uint      `json:"user_id"`
 	Name         string    `json:"name"`
 	OriginalName string    `json:"original_name"`
 	Description  string    `json:"description"`

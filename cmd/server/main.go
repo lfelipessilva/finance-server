@@ -4,10 +4,13 @@ import (
 	"finance/cmd/server/routes"
 	"finance/config"
 	"finance/internal/handler/http"
+	"finance/internal/middleware"
 	catRepo "finance/internal/repository/category"
 	tagRepo "finance/internal/repository/tag"
+	userRepo "finance/internal/repository/user"
 	catUC "finance/internal/usecase/category"
 	tagUC "finance/internal/usecase/tag"
+	userUC "finance/internal/usecase/user"
 
 	"finance/pkg/database"
 	"fmt"
@@ -36,6 +39,10 @@ func main() {
 	categoryUseCase := catUC.NewCategoryUseCse(categoryRepository)
 	categoryHandler := http.NewCategoryHandler(categoryUseCase)
 
+	userRepository := userRepo.NewPostgresRepository(db)
+	userUseCase := userUC.NewUserUseCse(userRepository)
+	authMiddleware := middleware.NewAuthMiddleware(cfg.JWTSecret, userUseCase)
+
 	router := gin.Default()
 	router.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
@@ -52,13 +59,18 @@ func main() {
 
 	api := router.Group("/api/v1")
 	{
-		routes.ExpensesRoutes(api, db)
-		routes.UserRoutes(api, db)
+		// Public routes (no auth required)
 		routes.AuthRoutes(api, db)
 		api.GET("/categories", categoryHandler.GetCategories)
-
 		api.GET("/tags", tagHandler.GetTags)
 
+		// Protected routes (auth required)
+		protected := api.Group("")
+		protected.Use(authMiddleware.Authenticate())
+		{
+			routes.ExpensesRoutes(protected, db)
+			routes.UserRoutes(protected, db)
+		}
 	}
 
 	if err := router.Run(":8080"); err != nil {

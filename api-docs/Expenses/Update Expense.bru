@@ -5,7 +5,7 @@ meta {
 }
 
 put {
-  url: {{baseUrl}}/expenses/1
+  url: {{url}}/expenses/1
   body: json {
     {
       "description": "Updated expense",
@@ -14,4 +14,9 @@ put {
       "date": "2024-01-15"
     }
   }
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
 } 

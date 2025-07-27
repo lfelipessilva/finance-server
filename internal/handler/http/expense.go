@@ -19,13 +19,18 @@ func NewExpenseHandler(uc expense.UseCase) *ExpenseHandler {
 }
 
 func (h *ExpenseHandler) CreateExpense(c *gin.Context) {
+	userID, _ := c.Get("user_id")
 	var input expense.CreateExpenseInput
+
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	input.UserID = userID.(uint)
+
 	createdExpense, err := h.uc.CreateExpense(c.Request.Context(), input)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -35,11 +40,15 @@ func (h *ExpenseHandler) CreateExpense(c *gin.Context) {
 }
 
 func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
+	userID, _ := c.Get("user_id")
 	var input expense.UpdateExpenseInput
+
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	input.UserID = userID.(uint)
 
 	id := c.Param("id")
 
@@ -53,6 +62,8 @@ func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
 }
 
 func (h *ExpenseHandler) UpdateExpenses(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+
 	var body struct {
 		IDs    []string                   `json:"ids"`
 		Values expense.UpdateExpenseInput `json:"values"`
@@ -64,6 +75,8 @@ func (h *ExpenseHandler) UpdateExpenses(c *gin.Context) {
 		return
 	}
 
+	body.Values.UserID = userID.(uint)
+
 	updatedExpesnes, err := h.uc.UpdateExpenses(c.Request.Context(), body.Values, body.IDs)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -74,11 +87,16 @@ func (h *ExpenseHandler) UpdateExpenses(c *gin.Context) {
 }
 
 func (h *ExpenseHandler) CreateExpenses(c *gin.Context) {
+	userID, _ := c.Get("user_id")
 	var inputs []expense.CreateExpenseInput
 
 	if err := c.ShouldBindJSON(&inputs); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request format"})
 		return
+	}
+
+	for i := range inputs {
+		inputs[i].UserID = userID.(uint)
 	}
 
 	createdExpenses, err := h.uc.CreateExpenses(c.Request.Context(), inputs)
@@ -91,9 +109,12 @@ func (h *ExpenseHandler) CreateExpenses(c *gin.Context) {
 }
 
 func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
-	filters := parseFilters(c)
+	userID, _ := c.Get("user_id")
+
+	filters := parseFilters(c, userID.(uint))
 
 	expenses, total, sum, err := h.uc.GetExpenses(c.Request.Context(), filters)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -111,7 +132,8 @@ func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
 }
 
 func (h *ExpenseHandler) GetExpensesByCategory(c *gin.Context) {
-	filters := parseFilters(c)
+	userID, _ := c.Get("user_id")
+	filters := parseFilters(c, userID.(uint))
 
 	groups, err := h.uc.GetExpensesByCategory(c.Request.Context(), filters)
 	if err != nil {
@@ -125,7 +147,8 @@ func (h *ExpenseHandler) GetExpensesByCategory(c *gin.Context) {
 }
 
 func (h *ExpenseHandler) GetExpensesByDate(c *gin.Context) {
-	filters := parseFilters(c)
+	userID, _ := c.Get("user_id")
+	filters := parseFilters(c, userID.(uint))
 
 	groups, err := h.uc.GetExpensesByDate(c.Request.Context(), filters)
 	if err != nil {
@@ -139,7 +162,8 @@ func (h *ExpenseHandler) GetExpensesByDate(c *gin.Context) {
 }
 
 func (h *ExpenseHandler) GetExpensesByDay(c *gin.Context) {
-	filters := parseFilters(c)
+	userID, _ := c.Get("user_id")
+	filters := parseFilters(c, userID.(uint))
 
 	groups, err := h.uc.GetExpensesByDay(c.Request.Context(), filters)
 	if err != nil {
@@ -153,7 +177,8 @@ func (h *ExpenseHandler) GetExpensesByDay(c *gin.Context) {
 }
 
 func (h *ExpenseHandler) GetExpensesByMonth(c *gin.Context) {
-	filters := parseFilters(c)
+	userID, _ := c.Get("user_id")
+	filters := parseFilters(c, userID.(uint))
 
 	groups, err := h.uc.GetExpensesByMonth(c.Request.Context(), filters)
 	if err != nil {
@@ -167,7 +192,8 @@ func (h *ExpenseHandler) GetExpensesByMonth(c *gin.Context) {
 }
 
 func (h *ExpenseHandler) GetExpensesByYear(c *gin.Context) {
-	filters := parseFilters(c)
+	userID, _ := c.Get("user_id")
+	filters := parseFilters(c, userID.(uint))
 
 	groups, err := h.uc.GetExpensesByYear(c.Request.Context(), filters)
 	if err != nil {
@@ -211,8 +237,10 @@ func (h *ExpenseHandler) DeleteExpenses(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-func parseFilters(c *gin.Context) domain.ExpenseFilters {
+func parseFilters(c *gin.Context, userID uint) domain.ExpenseFilters {
 	var filters domain.ExpenseFilters
+
+	filters.UserID = userID
 
 	if timestampStart := c.Query("timestamp_start"); timestampStart != "" {
 		filters.TimestampStart = timestampStart
