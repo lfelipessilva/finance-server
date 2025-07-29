@@ -1,21 +1,70 @@
 meta {
   name: Create Expense
   type: http
+  seq: 7
 }
 
 post {
-  url: {{url}}/expenses
-  body: json {
-    {
-      "description": "Sample expense",
-      "amount": 100.50,
-      "category_id": 1,
-      "date": "2024-01-15"
-    }
-  }
+  url: {{baseUrl}}/expenses
+  body: json
   auth: bearer
 }
 
 auth:bearer {
   token: {{access_token}}
-} 
+}
+
+body:json {
+  {
+    "name": "string",
+    "description": "string",
+    "bank": "string",
+    "card": "string",
+    "timestamp": "2025-01-01T00:00:00Z",
+    "value": 100,
+    "category_id": 1,
+    "tag_ids": [1, 2, 3]
+  }
+}
+
+docs {
+  description: Create a new expense
+  requestBody: |
+    {
+      "name": "string",
+      "description": "string",
+      "bank": "string",
+      "card": "string",
+      "timestamp": "2024-01-01T00:00:00Z",
+      "value": 100.50,
+      "category_id": 1,
+      "tag_ids": [1, 2, 3]
+    }
+  responseBody: |
+    {
+      "id": 1,
+      "user_id": 1,
+      "name": "string",
+      "original_name": "string",
+      "description": "string",
+      "bank": "string",
+      "card": "string",
+      "timestamp": "2024-01-01T00:00:00Z",
+      "value": 100.50,
+      "category_id": 1,
+      "category": {
+        "id": 1,
+        "name": "string",
+        "color": "string",
+        "icon": "string",
+        "url": "string"
+      },
+      "tags": [
+        {
+          "id": 1,
+          "name": "string",
+          "color": "string"
+        }
+      ]
+    }
+}

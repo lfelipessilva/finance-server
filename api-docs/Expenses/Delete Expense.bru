@@ -1,14 +1,21 @@
 meta {
   name: Delete Expense
   type: http
+  seq: 11
 }
 
 delete {
-  url: {{url}}/expenses/1
+  url: {{baseUrl}}/expenses/1278
   body: none
   auth: bearer
 }
 
 auth:bearer {
   token: {{access_token}}
-} 
+}
+
+docs {
+  description: Delete a specific expense by ID
+  responseBody: |
+    {}
+}

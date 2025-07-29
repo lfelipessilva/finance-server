@@ -1,24 +1,24 @@
 meta {
-  name: Get Expenses By Date
+  name: Get Expenses
   type: http
-  seq: 3
+  seq: 1
 }
 
 get {
-  url: {{baseUrl}}/expenses/date
+  url: {{baseUrl}}/expenses
   body: none
   auth: bearer
 }
 
 params:query {
+  ~timestamp_end: 2024-12-31T23:59:59Z
   ~name: string
   ~category: string
-  ~page_size: 50
-  ~order_direction: desc
-  ~order_by: timestamp
   ~page: 1
+  ~page_size: 50
+  ~order_by: timestamp
+  ~order_direction: desc
   ~timestamp_start: 2024-01-01T00:00:00Z
-  ~timestamp_end: 2024-12-31T23:59:59Z
 }
 
 auth:bearer {

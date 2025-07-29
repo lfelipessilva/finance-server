@@ -5,11 +5,37 @@ meta {
 }
 
 post {
-  url: {{url}}/auth
-  body: json {
-    {
-      "email": "john@example.com",
-      "password": "password123"
-    }
+  url: {{baseUrl}}/auth
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "id_token": "string"
   }
+}
+
+docs {
+  description: Authenticate user with Google OAuth
+  requestBody: |
+    {
+      "id_token": "string"
+    }
+  responseBody: |
+    {
+      "user": {
+        "id": 1,
+        "provider": "google",
+        "prover_user_id": "string",
+        "name": "string",
+        "email": "string",
+        "profile_picture": "string"
+      },
+      "access_token": "string"
+    }
 } 

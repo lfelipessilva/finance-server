@@ -5,7 +5,30 @@ meta {
 }
 
 get {
-  url: {{url}}/categories
+  url: {{baseUrl}}/categories
   body: none
-  auth: none
+  auth: bearer
+}
+
+params:query {
+  name: string
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  description: Get all categories with optional name filtering
+  queryParams: |
+    name: Filter by categories name
+  responseBody: |
+    [
+      {
+        "id": 1,
+        "name": "string",
+        "color": "string"
+        "url": "string"
+      }
+    ]
 }

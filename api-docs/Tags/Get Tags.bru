@@ -5,7 +5,28 @@ meta {
 }
 
 get {
-  url: {{url}}/tags
-  body: none
-  auth: none
+  url: {{baseUrl}}/tags
+  auth: bearer
 }
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+params:query {
+  name: string
+}
+
+docs {
+  description: Get all tags with optional name filtering
+  queryParams: |
+    name: Filter by tag name
+  responseBody: |
+    [
+      {
+        "id": 1,
+        "name": "string",
+        "color": "string"
+      }
+    ]
+} 

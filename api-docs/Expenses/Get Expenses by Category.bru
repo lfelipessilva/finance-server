@@ -1,18 +1,26 @@
 meta {
-  name: Get Expenses by Category
+  name: Get Expenses By Category
   type: http
   seq: 2
 }
 
 get {
-  url: {{url}}/expenses/category
-  query: {
-    category_id: 1
-  }
+  url: {{baseUrl}}/expenses/category
   body: none
   auth: bearer
 }
 
+params:query {
+  ~order_direction: desc
+  ~order_by: timestamp
+  ~page: 1
+  ~category: string
+  ~page_size: 50
+  ~timestamp_end: 2024-12-31T23:59:59Z
+  ~name: string
+  ~timestamp_start: 2024-01-01T00:00:00Z
+}
+
 auth:bearer {
-  token: {{access_token}}
-} 
+  token: {{accessToken}}
+}

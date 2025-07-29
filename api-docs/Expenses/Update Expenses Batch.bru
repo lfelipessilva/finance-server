@@ -5,28 +5,74 @@ meta {
 }
 
 put {
-  url: {{url}}/expenses/batch
-  body: json {
-    [
-      {
-        "id": 1,
-        "description": "Updated expense 1",
-        "amount": 100.00,
-        "category_id": 1,
-        "date": "2024-01-15"
-      },
-      {
-        "id": 2,
-        "description": "Updated expense 2",
-        "amount": 125.50,
-        "category_id": 2,
-        "date": "2024-01-16"
-      }
-    ]
-  }
+  url: {{baseUrl}}/expenses/batch
+  body: json
   auth: bearer
 }
 
 auth:bearer {
   token: {{access_token}}
+}
+
+body:json {
+  {
+    "ids": ["1", "2", "3"],
+    "values": {
+      "name": "string",
+      "description": "string",
+      "bank": "string",
+      "card": "string",
+      "timestamp": "2024-01-01T00:00:00Z",
+      "value": 100.50,
+      "category_id": 1,
+      "tag_ids": [1, 2, 3]
+    }
+  }
+}
+
+docs {
+  description: Update multiple expenses in batch
+  requestBody: |
+    {
+      "ids": ["1", "2", "3"],
+      "values": {
+        "name": "string",
+        "description": "string",
+        "bank": "string",
+        "card": "string",
+        "timestamp": "2024-01-01T00:00:00Z",
+        "value": 100.50,
+        "category_id": 1,
+        "tag_ids": [1, 2, 3]
+      }
+    }
+  responseBody: |
+    [
+      {
+        "id": 1,
+        "user_id": 1,
+        "name": "string",
+        "original_name": "string",
+        "description": "string",
+        "bank": "string",
+        "card": "string",
+        "timestamp": "2024-01-01T00:00:00Z",
+        "value": 100.50,
+        "category_id": 1,
+        "category": {
+          "id": 1,
+          "name": "string",
+          "color": "string",
+          "icon": "string",
+          "url": "string"
+        },
+        "tags": [
+          {
+            "id": 1,
+            "name": "string",
+            "color": "string"
+          }
+        ]
+      }
+    ]
 } 

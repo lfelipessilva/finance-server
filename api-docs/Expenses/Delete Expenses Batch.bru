@@ -5,10 +5,27 @@ meta {
 }
 
 delete {
-  url: {{url}}/expenses/batch
-  body: json {
-    {
-      "ids": [1, 2, 3]
-    }
+  url: {{baseUrl}}/expenses/batch
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "ids": ["1", "2", "3"]
   }
+}
+
+docs {
+  description: Delete multiple expenses in batch
+  requestBody: |
+    {
+      "ids": ["1", "2", "3"]
+    }
+  responseBody: |
+    {}
 } 

@@ -1,18 +1,50 @@
 meta {
-  name: Get Expenses by Year
+  name: Get Expenses By Year
   type: http
   seq: 6
 }
 
 get {
-  url: {{url}}/expenses/year
-  query: {
-    year: 2024
-  }
+  url: {{baseUrl}}/expenses/year
   body: none
   auth: bearer
 }
 
+params:query {
+  ~order_direction: desc
+  ~order_by: timestamp
+  ~page_size: 50
+  ~category: string
+  ~name: string
+  ~timestamp_end: 2024-12-31T23:59:59Z
+  ~timestamp_start: 2024-01-01T00:00:00Z
+  ~page: 1
+}
+
 auth:bearer {
   token: {{access_token}}
-} 
+}
+
+docs {
+  description: Get expenses grouped by year
+  queryParams: |
+    timestamp_start: Start date filter (ISO 8601 format)
+    timestamp_end: End date filter (ISO 8601 format)
+    name: Filter by expense name
+    category: Filter by category name
+    page: Page number (default: 1)
+    page_size: Items per page (default: 50)
+    order_by: Order by field
+    order_direction: Order direction (asc/desc)
+  responseBody: |
+    {
+      "data": [
+        {
+          "timestamp": "2024",
+          "category_name": "string",
+          "category_color": "string",
+          "total_value": 1000.50
+        }
+      ]
+    }
+}

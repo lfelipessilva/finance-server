@@ -1,18 +1,50 @@
 meta {
-  name: Get Expenses by Day
+  name: Get Expenses By Day
   type: http
   seq: 4
 }
 
 get {
-  url: {{url}}/expenses/day
-  query: {
-    day: 15
-  }
+  url: {{baseUrl}}/expenses/day
   body: none
   auth: bearer
 }
 
+params:query {
+  ~timestamp_end: 2024-12-31T23:59:59Z
+  ~timestamp_start: 2024-01-01T00:00:00Z
+  ~name: string
+  ~category: string
+  ~page: 1
+  ~page_size: 50
+  ~order_by: timestamp
+  ~order_direction: desc
+}
+
 auth:bearer {
   token: {{access_token}}
-} 
+}
+
+docs {
+  description: Get expenses grouped by day
+  queryParams: |
+    timestamp_start: Start date filter (ISO 8601 format)
+    timestamp_end: End date filter (ISO 8601 format)
+    name: Filter by expense name
+    category: Filter by category name
+    page: Page number (default: 1)
+    page_size: Items per page (default: 50)
+    order_by: Order by field
+    order_direction: Order direction (asc/desc)
+  responseBody: |
+    {
+      "data": [
+        {
+          "timestamp": "2024-01-01",
+          "category_name": "string",
+          "category_color": "string",
+          "total_value": 1000.50
+        }
+      ]
+    }
+}
