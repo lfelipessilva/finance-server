@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/caarlos0/env/v6"
 	"github.com/joho/godotenv"
@@ -19,6 +20,12 @@ type Config struct {
 	SSLMode             string `env:"SSL_MODE" envDefault:"disable"`
 	JWTSecret           string `env:"JWT_SECRET" envDefault:"your-secret-key"`
 	GoogleOAuthClientID string `env:"GOOGLE_OAUTH_CLIENT_ID" envDefault:""`
+
+	// Database pool configuration
+	DBMaxOpenConns    int           `env:"DB_MAX_OPEN_CONNS" envDefault:"25"`
+	DBMaxIdleConns    int           `env:"DB_MAX_IDLE_CONNS" envDefault:"10"`
+	DBConnMaxLifetime time.Duration `env:"DB_CONN_MAX_LIFETIME" envDefault:"5m"`
+	DBConnMaxIdleTime time.Duration `env:"DB_CONN_MAX_IDLE_TIME" envDefault:"1m"`
 }
 
 func Load() (*Config, error) {
