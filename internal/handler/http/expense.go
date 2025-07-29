@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -109,6 +110,7 @@ func (h *ExpenseHandler) CreateExpenses(c *gin.Context) {
 }
 
 func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
+	start := time.Now()
 	userID, _ := c.Get("user_id")
 
 	filters := parseFilters(c, userID.(uint))
@@ -119,6 +121,8 @@ func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	fmt.Println("Full handler time:", time.Since(start))
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": expenses,

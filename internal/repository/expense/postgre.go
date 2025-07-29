@@ -6,6 +6,7 @@ import (
 	"finance/internal/domain/entity"
 	"fmt"
 	"strconv"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -116,6 +117,7 @@ func (r *postgresRepository) CreateBatch(ctx context.Context, expenses []*entity
 
 func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, int, error) {
 	var expenses []entity.Expense
+	start := time.Now()
 	query := r.db.WithContext(ctx).Session(&gorm.Session{})
 
 	if filters.UserID != 0 {
@@ -158,6 +160,7 @@ func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.E
 		return nil, 0, 0, err
 	}
 
+	fmt.Println("Query time:", time.Since(start))
 	return expenses, int(total), int(sum), nil
 }
 
