@@ -6,18 +6,20 @@ import (
 )
 
 type Expense struct {
-	ID           uint      `gorm:"primaryKey" json:"id"`
-	UserID       uint      `json:"user_id"`
-	Name         string    `json:"name"`
-	OriginalName string    `json:"original_name"`
-	Description  string    `json:"description"`
-	Bank         string    `json:"bank"`
-	Card         string    `json:"card"`
-	Timestamp    time.Time `json:"timestamp"`
-	Value        float64   `json:"value"`
-	CategoryID   *uint     `json:"category_id,omitempty"`
-	Category     Category  `gorm:"foreignKey:CategoryID;constraint:OnDelete:CASCADE;" json:"category"`
-	Tags         []Tag     `gorm:"many2many:expense_tags;" json:"tags"`
+	ID            uint        `gorm:"primaryKey" json:"id"`
+	UserID        uint        `json:"user_id"`
+	Name          string      `json:"name"`
+	OriginalName  string      `json:"original_name"`
+	Description   string      `json:"description"`
+	Bank          string      `json:"bank"`
+	Card          string      `json:"card"`
+	Timestamp     time.Time   `json:"timestamp"`
+	Value         float64     `json:"value"`
+	CategoryID    *uint       `json:"category_id,omitempty"`
+	Category      Category    `gorm:"foreignKey:CategoryID;constraint:OnDelete:CASCADE;" json:"category"`
+	InstallmentID *uint       `json:"installment_id,omitempty"`
+	Installment   Installment `gorm:"foreignKey:InstallmentID;constraint:OnDelete:CASCADE;" json:"installment"`
+	Tags          []Tag       `gorm:"many2many:expense_tags;" json:"tags"`
 }
 
 func (e *Expense) Validate() error {

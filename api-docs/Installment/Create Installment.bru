@@ -1,0 +1,36 @@
+meta {
+  name: Create Installment
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/installments
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "expense_id": "string",
+    "quantity": 10,
+    "value": 100,
+  }
+}
+
+docs {
+  description: Create a new installment
+  requestBody: |
+    {
+      "expense_id": "string",
+      "quantity": 10,
+      "value": 100,
+    }
+  responseBody: |
+    {
+    }
+}
