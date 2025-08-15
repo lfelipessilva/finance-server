@@ -60,7 +60,7 @@ func (uc *installmentUseCase) CreateInstallment(ctx context.Context, input Creat
 	installmentValue := expense.Value / input.Quantity
 
 	installment := &entity.Installment{
-		Value:          installmentValue,
+		Value:          expense.Value,
 		Quantity:       int(input.Quantity),
 		TimestampStart: expense.Timestamp,
 		TimestampEnd:   expense.Timestamp.AddDate(0, int(input.Quantity), 0),
