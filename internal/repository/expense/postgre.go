@@ -34,6 +34,16 @@ func (r *postgresRepository) Create(ctx context.Context, expense *entity.Expense
 	return expense, nil
 }
 
+func (r *postgresRepository) FindById(ctx context.Context, id uint) (entity.Expense, error) {
+	var expense entity.Expense
+
+	if err := r.db.WithContext(ctx).First(&expense, id).Error; err != nil {
+		return entity.Expense{}, err
+	}
+
+	return expense, nil
+}
+
 func (r *postgresRepository) Update(ctx context.Context, expense *entity.Expense, id string) error {
 	expenseID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {

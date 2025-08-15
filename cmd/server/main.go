@@ -80,13 +80,13 @@ func main() {
 		routes.AuthRoutes(api, db)
 		routes.CategoriesRoutes(api, db)
 		routes.TagsRoutes(api, db)
+		routes.InstallmentsRoutes(api, db)
 
 		// Protected routes (auth required)
 		protected := api.Group("")
 		protected.Use(authMiddleware.Authenticate())
 		{
 			routes.ExpensesRoutes(protected, db)
-			routes.UserRoutes(protected, db)
 		}
 	}
 
