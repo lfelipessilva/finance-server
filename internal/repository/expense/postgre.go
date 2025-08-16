@@ -174,6 +174,41 @@ func (r *postgresRepository) FindByFilters(ctx context.Context, filters domain.E
 	return expenses, int(total), int(sum), nil
 }
 
+func (r *postgresRepository) FindFirstByFilters(ctx context.Context, filters domain.ExpenseFilters) (entity.Expense, error) {
+	var expense entity.Expense
+	query := r.db.WithContext(ctx).Session(&gorm.Session{})
+
+	if filters.UserID != 0 {
+		query = query.Where("user_id = ?", filters.UserID)
+	}
+
+	if filters.TimestampStart != "" {
+		query = query.Where("timestamp >= ?", filters.TimestampStart)
+	}
+
+	if filters.TimestampEnd != "" {
+		query = query.Where("timestamp <= ?", filters.TimestampEnd)
+	}
+
+	if filters.Name != "" {
+		query = query.Where("name ILIKE ?", "%"+filters.Name+"%")
+	}
+
+	if filters.OriginalName != "" {
+		query = query.Where("original_name ILIKE ?", "%"+filters.OriginalName+"%")
+	}
+
+	if filters.Category != "" {
+		query = query.Where("category_id = ?", filters.Category)
+	}
+
+	if err := query.Preload("Tags").Preload("Category").First(&expense).Error; err != nil {
+		return entity.Expense{}, err
+	}
+
+	return expense, nil
+}
+
 func (r *postgresRepository) GroupByCategory(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByGroup, error) {
 	var groups []entity.ExpenseByGroup
 

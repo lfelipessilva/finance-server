@@ -20,11 +20,43 @@ func NewExpenseUseCase(repo expense.Repository, tagRepo tag.Repository) UseCase 
 	return &expenseUseCase{repo: repo, tagRepo: tagRepo}
 }
 
+func (uc *expenseUseCase) categorizeExpenseAutomatically(ctx context.Context, input CreateExpenseInput) (*uint, error) {
+	if input.CategoryID != nil {
+		return input.CategoryID, nil
+	}
+
+	lowerName := strings.ToLower(input.Name)
+	switch {
+	case strings.Contains(lowerName, "uber"):
+		categoryID := uint(1)
+		return &categoryID, nil
+	case strings.Contains(lowerName, "ifood"), strings.Contains(lowerName, "ifd"):
+		categoryID := uint(10)
+		return &categoryID, nil
+	case strings.Contains(lowerName, "drogasil"):
+		categoryID := uint(17)
+		return &categoryID, nil
+	}
+
+	expenseWithSameName, err := uc.repo.FindFirstByFilters(ctx, domain.ExpenseFilters{
+		OriginalName: input.Name,
+		UserID:       input.UserID,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return expenseWithSameName.CategoryID, nil
+}
+
 func (uc *expenseUseCase) CreateExpense(ctx context.Context, input CreateExpenseInput) (*entity.Expense, error) {
 	tags, err := uc.tagRepo.FindById(ctx, input.TagIDs)
 	if err != nil {
 		return nil, err
 	}
+
+	categoryID, _ := uc.categorizeExpenseAutomatically(ctx, input)
 
 	expense := &entity.Expense{
 		UserID:       input.UserID,
@@ -32,7 +64,7 @@ func (uc *expenseUseCase) CreateExpense(ctx context.Context, input CreateExpense
 		Description:  input.Description,
 		OriginalName: input.Name,
 		Timestamp:    input.Timestamp,
-		CategoryID:   input.CategoryID,
+		CategoryID:   categoryID,
 		Tags:         tags,
 		Bank:         input.Bank,
 		Card:         input.Card,
