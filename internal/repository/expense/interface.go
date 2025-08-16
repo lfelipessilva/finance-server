@@ -12,6 +12,7 @@ type Repository interface {
 	UpdateBatch(ctx context.Context, expense *entity.Expense, id []string) error
 	CreateBatch(ctx context.Context, expense []*entity.Expense) ([]*entity.Expense, error)
 	FindByFilters(ctx context.Context, filters domain.ExpenseFilters) ([]entity.Expense, int, int, error)
+	FindFirstByFilters(ctx context.Context, filters domain.ExpenseFilters) (entity.Expense, error)
 	FindById(ctx context.Context, id uint) (entity.Expense, error)
 	GroupByCategory(ctx context.Context, filters domain.ExpenseFilters) ([]entity.ExpenseByGroup, error)
 	GroupByDateUnit(ctx context.Context, filters domain.ExpenseFilters, unit string) ([]entity.ExpenseByDate, error)
